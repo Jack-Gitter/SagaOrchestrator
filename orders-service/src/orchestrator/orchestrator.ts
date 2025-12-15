@@ -81,7 +81,7 @@ export class OrderSagaOrchestrator {
 	}
 
 
-	private orderRecievedAction(_, params: {orderId: number}) {
+	private orderRecievedAction(_, params: {orderId: number, productId: number, quantity: number}) {
 		console.log("entering the order received action")
 		// create an order object and save to the database
 		// create outbox message in the outbox table
@@ -89,26 +89,26 @@ export class OrderSagaOrchestrator {
 		// transition reserveInventoryState
 	}
 
-	private reserveInventoryAction(_, params: {orderId: number}) {
+	private reserveInventoryAction(_, params: {orderId: number, productId: number, quantity: number}) {
 		console.log("entering the reserve inventory action")
 		// poll for outbox message
 		// send outbox message
 		// remove message and transition state in a transaction
 	}
 
-	private shipOrderAction(_, params: {orderId: number}) {}
+	private shipOrderAction(_, params: {orderId: number, productId: number, quantity: number}) {}
 
-	private removeInventoryAction(_, params: {orderId: number}) {}
+	private removeInventoryAction(_, params: {orderId: number, productId: number, quantity: number}) {}
 
-	private removeInventoryActionRollback(_, params: {orderId: number}) {}
+	private removeInventoryActionRollback(_, params: {orderId: number, productId: number, quantity: number}) {}
 
-	private reserveInventoryRollbackAction(_, params: {orderId: number}) {}
+	private reserveInventoryRollbackAction(_, params: {orderId: number, productId: number, quantity: number}) {}
 
-	private orderRecievedRollbackAction(_, params: {orderId: number}) {}
+	private orderRecievedRollbackAction(_, params: {orderId: number, productId: number, quantity: number}) {}
 
-	private shipOrderRollbackAction(_, params: {orderId: number}) {}
+	private shipOrderRollbackAction(_, params: {orderId: number, productId: number, quantity: number}) {}
 
-	private confirmOrderAction(_, params: {orderId: number}) {}
+	private confirmOrderAction(_, params: {orderId: number, productId: number, quantity: number}) {}
 
 
 }
