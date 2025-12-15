@@ -21,7 +21,7 @@ export class OrderSagaOrchestrator {
 			},
 			reserveInventory: {
 			  on: { 
-				success: 'shipOrder', 
+				success: 'shipOrder',
 				failure: 'final', 
 			  },
 			},
