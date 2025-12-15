@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { OrderSagaOrchestrator } from "./orchestrator/orchestrator"
 import 'dotenv/config'
+import "reflect-metadata"
 
 const main = async () => {
 

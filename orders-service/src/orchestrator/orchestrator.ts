@@ -1,21 +1,21 @@
 import { UUID } from "node:crypto";
 import { Order } from "src/db/entities/order.entity";
+import { ReserveInventoryOutboxMessage } from "src/db/entities/reserve-inventory.outbox.message";
 import { DataSource } from "typeorm";
 import {setup, Actor, createActor } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
-	
-	private sagas = new Map<number, Actor<any>>();
+	private sagas = new Map<UUID, Actor<any>>();
 
 	constructor(private datasource: DataSource) {}
 
-	initializeOrderAction(orderId: number, productId: number, quantity: number) {
+	initializeOrderAction(orderId: UUID, productId: number, quantity: number) {
 
 		const orderMachineSetup = setup({
 		  types: {
 			events: {} as { type: 'success' } | { type: 'failure' },
-			context: {} as { orderId: number, productId: number, quantity: number},
+			context: {} as { orderId: UUID, productId: number, quantity: number},
 		  },
 		  actions: { 
 			  orderRecievedAction: this.orderRecievedAction,
@@ -59,10 +59,12 @@ export class OrderSagaOrchestrator {
 		  },
 		});
 
+
 		const actor = createActor(orderMachine);
 		actor.start()
 		actor.send({type: 'success'})
 		this.sagas.set(orderId, actor)
+
 	}
 
 	private setStep(type: string, success: string, failure: string): any {
@@ -85,8 +87,31 @@ export class OrderSagaOrchestrator {
 
 	private async orderRecievedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		console.log("entering the order received action")
+		// the main problem is that you do not want to actually transition the state machine until you persist everything, otherwise rollback is a pian 
 		await this.datasource.transaction(async (transaction) => {
-			const order = new Order(params.orderId, params.quantity, params.productId)
+			const saga = this.sagas.get(params.orderId)
+			try {
+				const orderRepository = transaction.getRepository(Order)
+				const inventoryReserveRepository = transaction.getRepository(ReserveInventoryOutboxMessage)
+
+				const order = new Order(params.orderId, params.quantity, params.productId)
+				const inventoryReserveMessage = new ReserveInventoryOutboxMessage(params.orderId, params.quantity, params.productId)
+
+				const snapshot = saga.getPersistedSnapshot()
+
+				await orderRepository.save(order)
+				await inventoryReserveRepository.save(inventoryReserveMessage)
+				// save snapshot
+				saga.send({type: 'success'})
+			} catch (err) {
+
+				
+
+			}
+
+			// persist everything
+
+
 		})
 		// all in a transaction
 		// create an order object 
