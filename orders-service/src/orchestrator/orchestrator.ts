@@ -50,15 +50,6 @@ export class OrderSagaOrchestrator {
 
 		const actor = createActor(toggleMachine);
 
-		actor.subscribe((snapshot) => {
-		  console.log('Value:', snapshot.value);
-		});
-
-		actor.start(); 
-
-		actor.send({ type: 'toggle' }); 
-		actor.send({ type: 'toggle' }); 
-
 		this.sagas.set(orderId, actor)
 	}
 
