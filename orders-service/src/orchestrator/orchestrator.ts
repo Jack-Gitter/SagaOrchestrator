@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import {setup, Actor, createActor, assign } from "xstate";
+import {setup, Actor, createActor, assign, StateNode } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
@@ -168,6 +168,23 @@ export class OrderSagaOrchestrator {
 		actor.start()
 		actor.send({type: 'success'})
 		this.sagas.set(orderId, actor)
+	}
+
+	private setStep(type: string, success: string, failure: string): any {
+	  return {
+	    entry: {
+		  type,
+		  params: ({context}) => ({
+		    orderId: context.orderId,
+		    productId: context.productId,
+		    quantity: context.quantity,
+		  })
+	    },
+	    on: { 
+		  success,
+		  failure,
+	    },
+	  }
 	}
 
 	private orderRecievedAction(_, params: {orderId: number}) {
