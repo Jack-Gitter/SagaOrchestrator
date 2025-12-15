@@ -74,13 +74,13 @@ export class OrderSagaOrchestrator {
 		// create an order object and save to the database
 		// create outbox message in the outbox table
 		// persist state of state machine
+		// transition reserveInventoryState
 	}
 
 	private reserveInventoryAction(orderId: number) {
 		// take the outbox message from the outbox table that corresponds with 
 		// the orderId
 		// send the message
-		// persist the state
 	}
 
 	private initiateShippingAction(orderId: number) {}
