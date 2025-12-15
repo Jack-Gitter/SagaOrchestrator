@@ -28,137 +28,30 @@ export class OrderSagaOrchestrator {
 		  },
 		})
 
+		const orderReceived = this.setStep('orderReceivedAction','reserveInventory', 'error')
+		const reserveInventory = this.setStep('reserveInventoryAction','shipOrder', 'orderReceivedRollback')
+		const shipOrder = this.setStep('shipOrderAction', 'removeInventory', 'inventoryReserveRollback')
+		const removeInventory = this.setStep('removeInventoryAction', 'confirmOrder', 'shipOrderRollback')
+		const confirmOrder = this.setStep('confirmOrderAction', 'final', 'removeInventoryAction')
+		const removeInventoryAction = this.setStep('removeInventoryActionRollback', 'shipOrderRollback', 'error')
+		const shipOrderRollback = this.setStep('shipOrderRollbackAction', 'reserveInventoryRollback', 'error')
+		const reserveInventoryRollback = this.setStep('reserveInventoryRollbackAction', 'orderRecievedRollback', 'error')
+		const orderReceivedRollback = this.setStep('orderRecievedRollbackAction', 'final', 'error')
+
 		const orderMachine = orderMachineSetup.createMachine({
 		  id: orderId.toString(),
 		  context: { orderId: orderId, productId: productId, quantity: quantity },
 		  initial: 'orderReceived',
 		  states: {
-			orderReceived: {
-			  entry: {
-			    type: 'orderRecievedAction',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'reserveInventory', 
-				failure: 'error', 
-			  },
-			},
-			reserveInventory: {
-			  entry: {
-			    type: 'reserveInventoryAction',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success:'shipOrder', 
-				failure: 'orderReceivedRollback', 
-			  },
-			},
-			shipOrder: {
-			  entry: {
-			    type: 'shipOrderAction',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'removeInventory', 
-				failure: 'inventoryReserveRollback', 
-			  },
-			},
-			removeInventory: {
-			  entry: {
-			    type: 'removeInventoryAction',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'confirmOrder', 
-				failure: 'shipOrderRollback', 
-			  },
-			},
-			confirmOrder: {
-			  entry: {
-			    type: 'confirmOrderAction',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'final', 
-				failure: 'removeInventoryActionRollback', 
-			  },
-			},
-			removeInventoryActionRollback: {
-			  entry: {
-			    type: 'removeInventoryActionRollback',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'shipOrderRollback', 
-				failure: 'error', 
-			  },
-			},
-			shipOrderRollback: {
-			  entry: {
-				type: 'shipOrderRollbackAction',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'reserveInventoryRollback', 
-				failure: 'error', 
-			  },
-			},
-			reserveInventoryRollback: {
-			  entry: {
-				type: 'reserveInventoryRollbackAction',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'orderReceivedRollback', 
-				failure: 'error', 
-			  },
-			},
-			orderReceivedRollback: {
-			  entry: {
-			    type: 'orderRecievedRollbackAction',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'final', 
-				failure: 'error', 
-			  },
-			},
+			orderReceived,
+			reserveInventory,
+			shipOrder,
+			removeInventory,
+			confirmOrder,
+			removeInventoryAction,
+			shipOrderRollback,
+			reserveInventoryRollback,
+			orderReceivedRollback,
 			final: {},
 			error: {}
 		  },
