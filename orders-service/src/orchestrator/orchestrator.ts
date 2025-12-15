@@ -1,6 +1,9 @@
 import { UUID } from "node:crypto";
+import { Inbox } from "src/db/entities/inbox.entity";
 import { Order } from "src/db/entities/order.entity";
-import { ReserveInventoryOutboxMessage } from "src/db/entities/reserve-inventory.outbox.message";
+import { ReserveInventoryOutboxMessage } from "src/db/entities/reserve-inventory-outbox-message.entity";
+import { Snapshot } from "src/db/entities/snapshot.entity";
+import { MESSAGE_TYPE } from "src/db/types";
 import { DataSource } from "typeorm";
 import {setup, Actor, createActor, StateMachine, createMachine } from "xstate";
 
@@ -86,40 +89,33 @@ export class OrderSagaOrchestrator {
 
 	private async orderRecievedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		console.log("entering the order received action")
-		// we need to make sure that we are persisting the NEXT state of the saga, because otherwise we have a problem if we fail to transition
+		const saga = this.sagas.get(params.orderId)
 		await this.datasource.transaction(async (transaction) => {
-			const saga = this.sagas.get(params.orderId)
 			try {
+				const inboxRepository = transaction.getRepository(Inbox)
+				if (await inboxRepository.findOneBy({orderId: params.orderId})) {
+					saga.send({type: 'success'})
+					
+				}
 				const orderRepository = transaction.getRepository(Order)
 				const inventoryReserveRepository = transaction.getRepository(ReserveInventoryOutboxMessage)
+				const snapshotRepository = transaction.getRepository(Snapshot)
 
 				const order = new Order(params.orderId, params.quantity, params.productId)
 				const inventoryReserveMessage = new ReserveInventoryOutboxMessage(params.orderId, params.quantity, params.productId)
+				const snapshot = saga.getPersistedSnapshot()
+				const inboxMessage = new Inbox(params.orderId, MESSAGE_TYPE.RECEIVE_ORDER);
 
-				// this needs to be the next state
-				const snapshot = saga.getSnapshot()
-
-				const machine = this.machines.get(params.orderId)
-
+				const snapshotEntity = new Snapshot(params.orderId, snapshot)
 				await orderRepository.save(order)
 				await inventoryReserveRepository.save(inventoryReserveMessage)
-				// save snapshot
-				saga.send({type: 'success'})
+				await snapshotRepository.save(snapshotEntity)
+				await inboxRepository.save(inboxMessage)
 			} catch (err) {
-
-				
-
+				saga.send({type: 'failure'})
 			}
-
-			// persist everything
-
-
 		})
-		// all in a transaction
-		// create an order object 
-		// create outbox message 
-		// transition state
-		// persist order object, outbox message, and state all in a transaction
+		saga.send({type: 'success'})
 	}
 
 	private reserveInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {

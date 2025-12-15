@@ -3,3 +3,7 @@ export enum ORDER_STATUS {
 	CANCELED = 'canceled',
 	FULFILLED = 'fulfilled'
 }
+
+export enum MESSAGE_TYPE {
+	RECEIVE_ORDER = 'receive_order'
+}

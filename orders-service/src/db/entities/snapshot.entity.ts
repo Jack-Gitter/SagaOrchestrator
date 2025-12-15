@@ -1,3 +1,4 @@
+import { UUID } from 'node:crypto';
 import {
   Entity,
   PrimaryColumn,
@@ -7,9 +8,9 @@ import {
 } from 'typeorm'
 
 @Entity({ name: 'snapshots' })
-export class StateMachineSnapshotEntity {
-  @PrimaryColumn('int')
-  orderId: number
+export class Snapshot {
+  @PrimaryColumn('uuid')
+  orderId: UUID
 
   @Column({ type: 'jsonb' })
   snapshot: unknown
@@ -20,7 +21,7 @@ export class StateMachineSnapshotEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  constructor(orderId: number, snapshot: unknown) {
+  constructor(orderId: UUID, snapshot: unknown) {
 	  this.orderId = orderId
 	  this.snapshot = snapshot
   }
