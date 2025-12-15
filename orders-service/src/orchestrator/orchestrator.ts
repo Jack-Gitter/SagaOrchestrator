@@ -13,6 +13,7 @@ export class OrderSagaOrchestrator {
 		const orderMachineSetup = setup({
 		  types: {
 			events: {} as { type: 'success' } | { type: 'failure' },
+			context: {} as { orderId: number, productId: number, quantity: number},
 		  },
 		  actions: { 
 			  orderRecievedAction: this.orderRecievedAction,
@@ -29,15 +30,17 @@ export class OrderSagaOrchestrator {
 
 		const orderMachine = orderMachineSetup.createMachine({
 		  id: orderId.toString(),
+		  context: {orderId: orderId, productId: productId, quantity: quantity},
 		  initial: 'orderReceived',
 		  states: {
 			orderReceived: {
 			  entry: {
 			    type: 'orderRecievedAction',
-				  params: {
-					dataSource: this.datasource,
-					orderId: orderId,
-				  }	
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success: 'reserveInventory', 
@@ -47,10 +50,11 @@ export class OrderSagaOrchestrator {
 			reserveInventory: {
 			  entry: {
 			    type: 'reserveInventoryAction',
-				  params: {
-					dataSource: this.datasource,
-					orderId: orderId,
-				  }
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success:'shipOrder', 
@@ -60,10 +64,11 @@ export class OrderSagaOrchestrator {
 			shipOrder: {
 			  entry: {
 			    type: 'shipOrderAction',
-			    params: {
-				  dataSource: this.datasource,
-				  orderId: orderId,
-			    }
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success: 'removeInventory', 
@@ -73,10 +78,11 @@ export class OrderSagaOrchestrator {
 			removeInventory: {
 			  entry: {
 			    type: 'removeInventoryAction',
-			    params: {
-				  dataSource: this.datasource,
-				  orderId: orderId,
-			    }
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success: 'confirmOrder', 
@@ -86,10 +92,11 @@ export class OrderSagaOrchestrator {
 			removeInventoryActionRollback: {
 			  entry: {
 			    type: 'removeInventoryActionRollback',
-			    params: {
-				  dataSource: this.datasource,
-				  orderId: orderId,
-			    }
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success: 'reserveInventoryRollbackAction', 
@@ -99,10 +106,11 @@ export class OrderSagaOrchestrator {
 			confirmOrder: {
 			  entry: {
 			    type: 'confirmOrderAction',
-			    params: {
-				  dataSource: this.datasource,
-				  orderId: orderId,
-			    }
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success: 'final', 
@@ -112,10 +120,11 @@ export class OrderSagaOrchestrator {
 			shipOrderRollback: {
 			  entry: {
 				type: 'shipOrderRollbackAction',
-			    params: {
-				  dataSource: this.datasource,
-				  orderId: orderId,
-			    }
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success: 'reserveInventoryRollback', 
@@ -125,10 +134,11 @@ export class OrderSagaOrchestrator {
 			reserveInventoryRollback: {
 			  entry: {
 				type: 'reserveInventoryRollbackAction',
-			    params: {
-				  dataSource: this.datasource,
-				  orderId: orderId,
-			    }
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success: 'final', 
@@ -138,10 +148,11 @@ export class OrderSagaOrchestrator {
 			orderReceivedRollback: {
 			  entry: {
 			    type: 'orderRecievedRollbackAction',
-				  params: {
-					dataSource: this.datasource,
-					orderId: orderId,
-				  }	
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
 			  },
 			  on: { 
 				success: 'final', 
@@ -159,7 +170,7 @@ export class OrderSagaOrchestrator {
 		this.sagas.set(orderId, actor)
 	}
 
-	private orderRecievedAction(_, params: {dataSource: DataSource, orderId: number}) {
+	private orderRecievedAction(_, params: {orderId: number}) {
 		console.log("entering the order received action")
 		// create an order object and save to the database
 		// create outbox message in the outbox table
@@ -167,26 +178,26 @@ export class OrderSagaOrchestrator {
 		// transition reserveInventoryState
 	}
 
-	private reserveInventoryAction(_, params: {dataSource: DataSource, orderId: number}) {
+	private reserveInventoryAction(_, params: {orderId: number}) {
 		console.log("entering the reserve inventory action")
 		// take the outbox message from the outbox table that corresponds with 
 		// the orderId
 		// send the message
 	}
 
-	private shipOrderAction(_, params: {dataSource: DataSource, orderId: number}) {}
+	private shipOrderAction(_, params: {orderId: number}) {}
 
-	private removeInventoryAction(_, params: {dataSource: DataSource, orderId: number}) {}
+	private removeInventoryAction(_, params: {orderId: number}) {}
 
-	private removeInventoryActionRollback(_, params: {dataSource: DataSource, orderId: number}) {}
+	private removeInventoryActionRollback(_, params: {orderId: number}) {}
 
-	private reserveInventoryRollbackAction(_, params: {dataSource: DataSource, orderId: number}) {}
+	private reserveInventoryRollbackAction(_, params: {orderId: number}) {}
 
-	private orderRecievedRollbackAction(_, params: {dataSource: DataSource, orderId: number}) {}
+	private orderRecievedRollbackAction(_, params: {orderId: number}) {}
 
-	private shipOrderRollbackAction(_, params: {dataSource: DataSource, orderId: number}) {}
+	private shipOrderRollbackAction(_, params: {orderId: number}) {}
 
-	private confirmOrderAction(_, params: {dataSource: DataSource, orderId: number}) {}
+	private confirmOrderAction(_, params: {orderId: number}) {}
 
 
 }
