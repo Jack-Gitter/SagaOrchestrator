@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import {setup, Actor, createActor } from "xstate";
+import {setup, Actor, createActor, assign } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
@@ -13,13 +13,24 @@ export class OrderSagaOrchestrator {
 		  types: {
 			events: {} as { type: 'success' } | { type: 'failure' },
 		  },
+		  actions: { 
+			  orderRecievedAction: this.orderRecievedAction
+		  },
 		}).createMachine({
 		  id: orderId.toString(),
 		  initial: 'orderReceived',
 		  states: {
 			orderReceived: {
 			  on: { 
-				success: 'reserveInventory', 
+				success: {
+					target: 'reserveInventory', 
+					actions: {
+						type: 'orderRecievedAction', 
+						params: {
+							dataSource: this.datasource
+						}
+					}
+				},
 				failure: 'final', 
 			  },
 			},
@@ -57,10 +68,7 @@ export class OrderSagaOrchestrator {
 		this.sagas.set(orderId, actor)
 	}
 
-	private persistOrderStateAction(orderId: number) {
-		// update the state of the order in the database 
-		// write outbox message to database
-		// serialize and write the state of the state machine to the database
+	private orderRecievedAction(_, params: {dataSource: DataSource}) {
 	}
 
 	private reserveInventoryAction(orderId: number) {}
