@@ -30,7 +30,7 @@ export class OrderSagaOrchestrator {
 
 		const orderMachine = orderMachineSetup.createMachine({
 		  id: orderId.toString(),
-		  context: {orderId: orderId, productId: productId, quantity: quantity},
+		  context: { orderId: orderId, productId: productId, quantity: quantity },
 		  initial: 'orderReceived',
 		  states: {
 			orderReceived: {
