@@ -83,17 +83,21 @@ export class OrderSagaOrchestrator {
 
 	private orderRecievedAction(_, params: {orderId: number, productId: number, quantity: number}) {
 		console.log("entering the order received action")
-		// create an order object and save to the database
-		// create outbox message in the outbox table
-		// persist state of state machine
-		// transition reserveInventoryState
+		// all in a transaction
+		// create an order object 
+		// create outbox message 
+		// transition state
+		// persist order object, outbox message, and state all in a transaction
 	}
 
 	private reserveInventoryAction(_, params: {orderId: number, productId: number, quantity: number}) {
 		console.log("entering the reserve inventory action")
 		// poll for outbox message
 		// send outbox message
-		// remove message and transition state in a transaction
+		// in a transaction
+		// remove message 
+		// transition state machine 
+		// persist both removal and state machine state to the database
 	}
 
 	private shipOrderAction(_, params: {orderId: number, productId: number, quantity: number}) {}
