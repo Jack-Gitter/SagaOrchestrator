@@ -53,15 +53,15 @@ export class OrderSagaOrchestrator {
 		this.sagas.set(orderId, actor)
 	}
 
-	private persistOrderStateAction() {
+	private persistOrderStateAction(orderId: number) {
 		// update the state of the order in the database 
 		// write outbox message to database
 		// serialize and write the state of the state machine to the database
 	}
 
-	private reserveInventoryAction() {}
+	private reserveInventoryAction(orderId: number) {}
 
-	private initiateShippingAction() {}
+	private initiateShippingAction(orderId: number) {}
 
-	private removeInventoryAction() {}
+	private removeInventoryAction(orderId: number) {}
 }
