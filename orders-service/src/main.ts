@@ -1,15 +1,16 @@
 import { DataSource } from "typeorm";
 import { OrderSagaOrchestrator } from "./orchestrator/orchestrator"
+import 'dotenv/config'
 
 const main = async () => {
 
 	const datasource = new DataSource({
-		type: "mysql",
+		type: 'postgres',
 		host: "localhost",
-		port: 3306,
-		username: "test",
-		password: "test",
-		database: "test",
+		port: Number(process.env.PORT),
+		username: process.env.USERNAME,
+		password: process.env.PASSWORD,
+		database: process.env.DATABASE,
 	})
 
 	const saga = new OrderSagaOrchestrator(datasource);

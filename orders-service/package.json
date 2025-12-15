@@ -17,6 +17,7 @@
     "xstate": "^5.25.0"
   },
   "devDependencies": {
+    "@types/node": "^25.0.2",
     "dotenv": "^17.2.3",
     "typescript": "^5.9.3"
   }
