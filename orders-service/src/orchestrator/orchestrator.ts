@@ -9,12 +9,9 @@ export class OrderSagaOrchestrator {
 	constructor(private datasource: DataSource) {}
 
 
-	initializeOrderSaga(orderId: number, productId: number, quantity: number, ) {
-
-	}
+	initializeOrderAction(orderId: number, productId: number, quantity: number) {}
 
 	private persistOrderStateAction() {
-
 		// update the state of the order in the database 
 		// write outbox message to database
 		// serialize and write the state of the state machine to the database
