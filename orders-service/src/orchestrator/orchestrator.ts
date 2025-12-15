@@ -103,10 +103,10 @@ export class OrderSagaOrchestrator {
 
 				const order = new Order(params.orderId, params.quantity, params.productId)
 				const inventoryReserveMessage = new ReserveInventoryOutboxMessage(params.orderId, params.quantity, params.productId)
-				const snapshot = saga.getPersistedSnapshot()
 				const inboxMessage = new Inbox(params.orderId, MESSAGE_TYPE.RECEIVE_ORDER);
-
+				const snapshot = saga.getPersistedSnapshot()
 				const snapshotEntity = new Snapshot(params.orderId, snapshot)
+
 				await orderRepository.save(order)
 				await inventoryReserveRepository.save(inventoryReserveMessage)
 				await snapshotRepository.save(snapshotEntity)
