@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { Actor, createActor, createMachine, StateMachine} from "xstate";
+import {setup, Actor, createActor } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
@@ -9,7 +9,11 @@ export class OrderSagaOrchestrator {
 	constructor(private datasource: DataSource) {}
 
 	initializeOrderAction(orderId: number, productId: number, quantity: number) {
-		const orderMachine = createMachine({
+		const orderMachine = setup({
+		  types: {
+			events: {} as { type: 'success' } | { type: 'failure' },
+		  },
+		}).createMachine({
 		  id: orderId.toString(),
 		  initial: 'orderReceived',
 		  states: {
