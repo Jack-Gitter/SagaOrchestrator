@@ -1,3 +1,5 @@
+import { UUID } from "node:crypto";
+import { Order } from "src/db/entities/order.entity";
 import { DataSource } from "typeorm";
 import {setup, Actor, createActor, assign, StateNode } from "xstate";
 
@@ -81,8 +83,11 @@ export class OrderSagaOrchestrator {
 	}
 
 
-	private orderRecievedAction(_, params: {orderId: number, productId: number, quantity: number}) {
+	private async orderRecievedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		console.log("entering the order received action")
+		await this.datasource.transaction(async (transaction) => {
+			const order = new Order(params.orderId, params.quantity, params.productId)
+		})
 		// all in a transaction
 		// create an order object 
 		// create outbox message 
@@ -90,7 +95,7 @@ export class OrderSagaOrchestrator {
 		// persist order object, outbox message, and state all in a transaction
 	}
 
-	private reserveInventoryAction(_, params: {orderId: number, productId: number, quantity: number}) {
+	private reserveInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		console.log("entering the reserve inventory action")
 		// poll for outbox message
 		// send outbox message
@@ -100,19 +105,19 @@ export class OrderSagaOrchestrator {
 		// persist both removal and state machine state to the database
 	}
 
-	private shipOrderAction(_, params: {orderId: number, productId: number, quantity: number}) {}
+	private shipOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private removeInventoryAction(_, params: {orderId: number, productId: number, quantity: number}) {}
+	private removeInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private removeInventoryActionRollback(_, params: {orderId: number, productId: number, quantity: number}) {}
+	private removeInventoryActionRollback(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private reserveInventoryRollbackAction(_, params: {orderId: number, productId: number, quantity: number}) {}
+	private reserveInventoryRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private orderRecievedRollbackAction(_, params: {orderId: number, productId: number, quantity: number}) {}
+	private orderRecievedRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private shipOrderRollbackAction(_, params: {orderId: number, productId: number, quantity: number}) {}
+	private shipOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private confirmOrderAction(_, params: {orderId: number, productId: number, quantity: number}) {}
+	private confirmOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
 
 }

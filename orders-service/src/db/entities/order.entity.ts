@@ -1,6 +1,6 @@
-import { UUID } from "node:crypto";
+import { randomUUID, UUID } from "node:crypto";
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { ORDER_STATUS } from "./types";
+import { ORDER_STATUS } from "../types";
 
 @Entity()
 export class Order {
@@ -26,9 +26,10 @@ export class Order {
 	@UpdateDateColumn()
 	updatedAt: Date;
 	
-	constructor(quantity: number, productId: number) {
+	constructor(quantity: number, productId: number, orderId: UUID) {
 		this.quantity = quantity;
 		this.productId = productId;
 		this.status = ORDER_STATUS.PENDING;
+		this.orderId = orderId;
 	}
 }
