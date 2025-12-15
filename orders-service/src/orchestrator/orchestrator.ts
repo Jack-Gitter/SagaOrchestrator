@@ -29,8 +29,8 @@ export class OrderSagaOrchestrator {
 			    type: 'orderRecievedAction',
 				  params: {
 					dataSource: this.datasource,
-					  orderId: orderId,
-					}
+					orderId: orderId,
+				  }	
 			  },
 			  on: { 
 				success: 'reserveInventory', 
@@ -42,8 +42,8 @@ export class OrderSagaOrchestrator {
 			    type: 'reserveInventoryAction',
 				  params: {
 					dataSource: this.datasource,
-					  orderId: orderId,
-					}
+					orderId: orderId,
+				  }
 			  },
 			  on: { 
 				success:'shipOrder', 
