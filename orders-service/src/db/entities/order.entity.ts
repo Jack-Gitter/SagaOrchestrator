@@ -1,4 +1,4 @@
-import { randomUUID, UUID } from "node:crypto";
+import { UUID } from "node:crypto";
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { ORDER_STATUS } from "./types";
 
