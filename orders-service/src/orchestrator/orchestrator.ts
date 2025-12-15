@@ -89,20 +89,6 @@ export class OrderSagaOrchestrator {
 				failure: 'shipOrderRollback', 
 			  },
 			},
-			removeInventoryActionRollback: {
-			  entry: {
-			    type: 'removeInventoryActionRollback',
-				params: ({context}) => ({
-					orderId: context.orderId,
-					productId: context.productId,
-					quantity: context.quantity,
-				})
-			  },
-			  on: { 
-				success: 'reserveInventoryRollbackAction', 
-				failure: 'error', 
-			  },
-			},
 			confirmOrder: {
 			  entry: {
 			    type: 'confirmOrderAction',
@@ -115,6 +101,20 @@ export class OrderSagaOrchestrator {
 			  on: { 
 				success: 'final', 
 				failure: 'removeInventoryActionRollback', 
+			  },
+			},
+			removeInventoryActionRollback: {
+			  entry: {
+			    type: 'removeInventoryActionRollback',
+				params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				})
+			  },
+			  on: { 
+				success: 'shipOrderRollback', 
+				failure: 'error', 
 			  },
 			},
 			shipOrderRollback: {
@@ -141,7 +141,7 @@ export class OrderSagaOrchestrator {
 				})
 			  },
 			  on: { 
-				success: 'final', 
+				success: 'orderReceivedRollback', 
 				failure: 'error', 
 			  },
 			},
