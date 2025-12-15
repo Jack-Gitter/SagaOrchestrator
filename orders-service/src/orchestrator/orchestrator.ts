@@ -80,9 +80,6 @@ export class OrderSagaOrchestrator {
 	  }
 	}
 
-	private pollOutbox() {
-		// do all outbox sending from here, just makes it so much easier
-	}
 
 	private orderRecievedAction(_, params: {orderId: number}) {
 		console.log("entering the order received action")
@@ -94,10 +91,9 @@ export class OrderSagaOrchestrator {
 
 	private reserveInventoryAction(_, params: {orderId: number}) {
 		console.log("entering the reserve inventory action")
-		// take outbox message from table
-		// send the message
-		// transition state machine
-		// remove the message
+		// poll for outbox message
+		// send outbox message
+		// remove message and transition state in a transaction
 	}
 
 	private shipOrderAction(_, params: {orderId: number}) {}
