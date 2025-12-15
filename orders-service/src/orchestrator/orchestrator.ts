@@ -90,13 +90,14 @@ export class OrderSagaOrchestrator {
 	private async orderRecievedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		console.log("entering the order received action")
 		const saga = this.sagas.get(params.orderId)
+		const inboxRepository = this.datasource.getRepository(Inbox)
+		if (await inboxRepository.findOneBy({orderId: params.orderId})) {
+			saga.send({type: 'success'})
+			return;
+		}
 		await this.datasource.transaction(async (transaction) => {
 			try {
 				const inboxRepository = transaction.getRepository(Inbox)
-				if (await inboxRepository.findOneBy({orderId: params.orderId})) {
-					saga.send({type: 'success'})
-					
-				}
 				const orderRepository = transaction.getRepository(Order)
 				const inventoryReserveRepository = transaction.getRepository(ReserveInventoryOutboxMessage)
 				const snapshotRepository = transaction.getRepository(Snapshot)
