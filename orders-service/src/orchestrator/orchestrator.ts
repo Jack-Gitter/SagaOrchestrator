@@ -1,7 +1,7 @@
 import { UUID } from "node:crypto";
 import { Order } from "src/db/entities/order.entity";
 import { DataSource } from "typeorm";
-import {setup, Actor, createActor, assign, StateNode } from "xstate";
+import {setup, Actor, createActor } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
