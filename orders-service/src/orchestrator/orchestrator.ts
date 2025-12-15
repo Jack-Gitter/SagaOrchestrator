@@ -10,15 +10,41 @@ export class OrderSagaOrchestrator {
 
 	initializeOrderAction(orderId: number, productId: number, quantity: number) {
 		const toggleMachine = createMachine({
-		  id: 'toggle',
-		  initial: 'Inactive',
+		  id: orderId.toString(),
+		  initial: 'orderReceived',
 		  states: {
-			Inactive: {
-			  on: { toggle: 'Active' },
+			orderReceived: {
+			  on: { 
+				success: 'reserveInventory', 
+				failure: 'final', 
+			  },
 			},
-			Active: {
-			  on: { toggle: 'Inactive' },
+			reserveInventory: {
+			  on: { 
+				success: 'shipOrder', 
+				failure: 'final', 
+			  },
 			},
+			shipOrder: {
+			  on: { 
+				success: 'final', 
+				failure: 'shipOrderRollback', 
+			  },
+			},
+			shipOrderRollback: {
+			  on: { 
+				success: 'reserveInventoryRollback', 
+				failure: 'error', 
+			  },
+			},
+			reserveInventoryRollback: {
+			  on: { 
+				success: 'final', 
+				failure: 'error', 
+			  },
+			},
+			final: {},
+			error: {}
 		  },
 		});
 
