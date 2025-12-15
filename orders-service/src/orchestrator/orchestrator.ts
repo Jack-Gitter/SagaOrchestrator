@@ -93,9 +93,10 @@ export class OrderSagaOrchestrator {
 		const inboxRepository = this.datasource.getRepository(Inbox)
 		if (await inboxRepository.findOneBy({orderId: params.orderId})) {
 			saga.send({type: 'success'})
+			return;
 		}
-		await this.datasource.transaction(async (transaction) => {
-			try {
+		try {
+			await this.datasource.transaction(async (transaction) => {
 				const inboxRepository = transaction.getRepository(Inbox)
 				const orderRepository = transaction.getRepository(Order)
 				const inventoryReserveRepository = transaction.getRepository(ReserveInventoryOutboxMessage)
@@ -111,10 +112,10 @@ export class OrderSagaOrchestrator {
 				await inventoryReserveRepository.save(inventoryReserveMessage)
 				await snapshotRepository.save(snapshotEntity)
 				await inboxRepository.save(inboxMessage)
-			} catch (err) {
-				saga.send({type: 'failure'})
-			}
-		})
+			})
+		} catch (err) {
+			saga.send({type: 'failure'})
+		}
 		saga.send({type: 'success'})
 	}
 
