@@ -9,35 +9,44 @@ export class OrderSagaOrchestrator {
 	constructor(private datasource: DataSource) {}
 
 	initializeOrderAction(orderId: number, productId: number, quantity: number) {
-		const orderMachine = setup({
+
+		const orderMachineSetup = setup({
 		  types: {
 			events: {} as { type: 'success' } | { type: 'failure' },
 		  },
 		  actions: { 
-			  orderRecievedAction: this.orderRecievedAction
+			  orderRecievedAction: this.orderRecievedAction,
+			  reserveInventoryAction: this.reserveInventoryAction
 		  },
-		}).createMachine({
+		})
+
+		const orderMachine = orderMachineSetup.createMachine({
 		  id: orderId.toString(),
 		  initial: 'orderReceived',
 		  states: {
 			orderReceived: {
-			  on: { 
-				success: {
-					target: 'reserveInventory', 
-					actions: {
-						type: 'orderRecievedAction', 
-						params: {
-							dataSource: this.datasource,
-							orderId: orderId,
-						}
+			  entry: {
+			    type: 'orderRecievedAction',
+				  params: {
+					dataSource: this.datasource,
+					  orderId: orderId,
 					}
-				},
+			  },
+			  on: { 
+				success: 'reserveInventory', 
 				failure: 'final', 
 			  },
 			},
 			reserveInventory: {
+			  entry: {
+			    type: 'reserveInventoryAction',
+				  params: {
+					dataSource: this.datasource,
+					  orderId: orderId,
+					}
+			  },
 			  on: { 
-				success: 'shipOrder',
+				success:'shipOrder', 
 				failure: 'final', 
 			  },
 			},
@@ -71,13 +80,15 @@ export class OrderSagaOrchestrator {
 	}
 
 	private orderRecievedAction(_, params: {dataSource: DataSource, orderId: number}) {
+		console.log("entering the order received action")
 		// create an order object and save to the database
 		// create outbox message in the outbox table
 		// persist state of state machine
 		// transition reserveInventoryState
 	}
 
-	private reserveInventoryAction(orderId: number) {
+	private reserveInventoryAction(_, params: {dataSource: DataSource, orderId: number}) {
+		console.log("entering the reserve inventory action")
 		// take the outbox message from the outbox table that corresponds with 
 		// the orderId
 		// send the message
