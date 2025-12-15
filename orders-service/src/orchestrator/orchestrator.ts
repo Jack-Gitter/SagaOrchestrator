@@ -7,7 +7,6 @@ import {setup, Actor, createActor, StateMachine, createMachine } from "xstate";
 export class OrderSagaOrchestrator {
 	
 	private sagas = new Map<UUID, Actor<any>>();
-	private machines = new Map<UUID, StateMachine<any, any, any, any, any, any, any, any, any, any, any, any, any, any>>();
 
 	constructor(private datasource: DataSource) {}
 
@@ -63,9 +62,7 @@ export class OrderSagaOrchestrator {
 
 		const actor = createActor(orderMachine);
 		actor.start()
-		actor.send({type: 'success'})
 		this.sagas.set(orderId, actor)
-		this.machines.set(orderId, orderMachine)
 
 	}
 
