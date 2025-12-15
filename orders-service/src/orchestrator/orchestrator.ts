@@ -87,7 +87,7 @@ export class OrderSagaOrchestrator {
 
 	private async orderRecievedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		console.log("entering the order received action")
-		// the main problem is that you do not want to actually transition the state machine until you persist everything, otherwise rollback is a pian 
+		// we need to make sure that we are persisting the NEXT state of the saga, because otherwise we have a problem if we fail to transition
 		await this.datasource.transaction(async (transaction) => {
 			const saga = this.sagas.get(params.orderId)
 			try {
