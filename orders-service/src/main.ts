@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 import { OrderSagaOrchestrator } from "./orchestrator/orchestrator"
 import 'dotenv/config'
 import "reflect-metadata"
+import { randomUUID } from "node:crypto";
 
 const main = async () => {
 
@@ -16,7 +17,7 @@ const main = async () => {
 
 	const saga = new OrderSagaOrchestrator(datasource);
 
-	saga.initializeOrderAction(1, 2, 3)
+	saga.initializeOrderAction(randomUUID(), 2, 3)
 
 }
 

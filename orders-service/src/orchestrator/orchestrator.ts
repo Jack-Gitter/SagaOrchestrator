@@ -2,11 +2,12 @@ import { UUID } from "node:crypto";
 import { Order } from "src/db/entities/order.entity";
 import { ReserveInventoryOutboxMessage } from "src/db/entities/reserve-inventory.outbox.message";
 import { DataSource } from "typeorm";
-import {setup, Actor, createActor } from "xstate";
+import {setup, Actor, createActor, StateMachine, createMachine } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
 	private sagas = new Map<UUID, Actor<any>>();
+	private machines = new Map<UUID, StateMachine<any, any, any, any, any, any, any, any, any, any, any, any, any, any>>();
 
 	constructor(private datasource: DataSource) {}
 
@@ -64,6 +65,7 @@ export class OrderSagaOrchestrator {
 		actor.start()
 		actor.send({type: 'success'})
 		this.sagas.set(orderId, actor)
+		this.machines.set(orderId, orderMachine)
 
 	}
 
@@ -97,7 +99,10 @@ export class OrderSagaOrchestrator {
 				const order = new Order(params.orderId, params.quantity, params.productId)
 				const inventoryReserveMessage = new ReserveInventoryOutboxMessage(params.orderId, params.quantity, params.productId)
 
-				const snapshot = saga.getPersistedSnapshot()
+				// this needs to be the next state
+				const snapshot = saga.getSnapshot()
+
+				const machine = this.machines.get(params.orderId)
 
 				await orderRepository.save(order)
 				await inventoryReserveRepository.save(inventoryReserveMessage)

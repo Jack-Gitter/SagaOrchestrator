@@ -2,7 +2,7 @@ import { UUID } from "node:crypto";
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { ORDER_STATUS } from "../types";
 
-@Entity('order')
+@Entity('orders')
 export class Order {
 
 	@PrimaryColumn("uuid")
