@@ -9,7 +9,7 @@ export class OrderSagaOrchestrator {
 	constructor(private datasource: DataSource) {}
 
 	initializeOrderAction(orderId: number, productId: number, quantity: number) {
-		const toggleMachine = createMachine({
+		const orderMachine = createMachine({
 		  id: orderId.toString(),
 		  initial: 'orderReceived',
 		  states: {
@@ -48,8 +48,8 @@ export class OrderSagaOrchestrator {
 		  },
 		});
 
-		const actor = createActor(toggleMachine);
-
+		const actor = createActor(orderMachine);
+		actor.start()
 		this.sagas.set(orderId, actor)
 	}
 
