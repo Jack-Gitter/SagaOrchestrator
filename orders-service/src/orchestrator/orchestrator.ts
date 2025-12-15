@@ -16,7 +16,12 @@ export class OrderSagaOrchestrator {
 		  },
 		  actions: { 
 			  orderRecievedAction: this.orderRecievedAction,
-			  reserveInventoryAction: this.reserveInventoryAction
+			  reserveInventoryAction: this.reserveInventoryAction,
+			  shipOrderAction: this.shipOrderAction,
+			  shipOrderRollbackAction: this.shipOrderRollbackAction,
+			  reserveInventoryRollbackAction: this.reserveInventoryRollbackAction,
+			  orderRecievedRollbackAction: this.orderRecievedRollbackAction,
+			  removeInventoryAction: this.removeInventoryAction
 		  },
 		})
 
@@ -34,7 +39,7 @@ export class OrderSagaOrchestrator {
 			  },
 			  on: { 
 				success: 'reserveInventory', 
-				failure: 'final', 
+				failure: 'error', 
 			  },
 			},
 			reserveInventory: {
@@ -47,22 +52,69 @@ export class OrderSagaOrchestrator {
 			  },
 			  on: { 
 				success:'shipOrder', 
-				failure: 'final', 
+				failure: 'orderReceivedRollback', 
 			  },
 			},
 			shipOrder: {
+			  entry: {
+			    type: 'shipOrderAction',
+			    params: {
+				  dataSource: this.datasource,
+				  orderId: orderId,
+			    }
+			  },
+			  on: { 
+				success: 'removeInventory', 
+				failure: 'inventoryReserveRollback', 
+			  },
+			},
+			removeInventory: {
+			  entry: {
+			    type: 'removeInventoryAction',
+			    params: {
+				  dataSource: this.datasource,
+				  orderId: orderId,
+			    }
+			  },
 			  on: { 
 				success: 'final', 
 				failure: 'shipOrderRollback', 
 			  },
 			},
 			shipOrderRollback: {
+			  entry: {
+				type: 'shipOrderRollbackAction',
+			    params: {
+				  dataSource: this.datasource,
+				  orderId: orderId,
+			    }
+			  },
 			  on: { 
 				success: 'reserveInventoryRollback', 
 				failure: 'error', 
 			  },
 			},
 			reserveInventoryRollback: {
+			  entry: {
+				type: 'reserveInventoryRollbackAction',
+			    params: {
+				  dataSource: this.datasource,
+				  orderId: orderId,
+			    }
+			  },
+			  on: { 
+				success: 'final', 
+				failure: 'error', 
+			  },
+			},
+			orderReceivedRollback: {
+			  entry: {
+			    type: 'orderRecievedRollbackAction',
+				  params: {
+					dataSource: this.datasource,
+					orderId: orderId,
+				  }	
+			  },
 			  on: { 
 				success: 'final', 
 				failure: 'error', 
@@ -94,7 +146,15 @@ export class OrderSagaOrchestrator {
 		// send the message
 	}
 
-	private initiateShippingAction(orderId: number) {}
+	private shipOrderAction(_, params: {dataSource: DataSource, orderId: number}) {}
 
-	private removeInventoryAction(orderId: number) {}
+	private removeInventoryAction(_, params: {dataSource: DataSource, orderId: number}) {}
+
+	private reserveInventoryRollbackAction(_, params: {dataSource: DataSource, orderId: number}) {}
+
+	private orderRecievedRollbackAction(_, params: {dataSource: DataSource, orderId: number}) {}
+
+	private shipOrderRollbackAction(_, params: {dataSource: DataSource, orderId: number}) {}
+
+
 }
