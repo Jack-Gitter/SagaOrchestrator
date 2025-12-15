@@ -27,7 +27,8 @@ export class OrderSagaOrchestrator {
 					actions: {
 						type: 'orderRecievedAction', 
 						params: {
-							dataSource: this.datasource
+							dataSource: this.datasource,
+							orderId: orderId,
 						}
 					}
 				},
@@ -65,13 +66,22 @@ export class OrderSagaOrchestrator {
 
 		const actor = createActor(orderMachine);
 		actor.start()
+		actor.send({type: 'success'})
 		this.sagas.set(orderId, actor)
 	}
 
-	private orderRecievedAction(_, params: {dataSource: DataSource}) {
+	private orderRecievedAction(_, params: {dataSource: DataSource, orderId: number}) {
+		// create an order object and save to the database
+		// create outbox message in the outbox table
+		// persist state of state machine
 	}
 
-	private reserveInventoryAction(orderId: number) {}
+	private reserveInventoryAction(orderId: number) {
+		// take the outbox message from the outbox table that corresponds with 
+		// the orderId
+		// send the message
+		// persist the state
+	}
 
 	private initiateShippingAction(orderId: number) {}
 
