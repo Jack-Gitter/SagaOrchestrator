@@ -93,7 +93,6 @@ export class OrderSagaOrchestrator {
 		const inboxRepository = this.datasource.getRepository(Inbox)
 		if (await inboxRepository.findOneBy({orderId: params.orderId})) {
 			saga.send({type: 'success'})
-			return;
 		}
 		await this.datasource.transaction(async (transaction) => {
 			try {
