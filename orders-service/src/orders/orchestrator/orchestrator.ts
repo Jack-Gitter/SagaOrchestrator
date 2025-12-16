@@ -50,7 +50,7 @@ export class OrderSagaOrchestrator {
 							INVENTORY_REMOVE_SUCCESS: { target: 'handleInventoryRemoveSuccess' } 
 						}
 					},
-					handleInventoryRemoveSuccess: {
+					handleInventoryRemoveSuccess: { 
 						invoke: {
 							src: 'handleRemoveInventoryResponse',
 							input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity }),
