@@ -6,7 +6,7 @@ export class InventoryService {
 	constructor(private datasource: DataSource) {}
 
 
-	public handleInventoryResponse(orderId: UUID, productId: number, quantity: number) {
+	async handleInventoryResponse(orderId: UUID, productId: number, quantity: number) {
 
 	}
 
