@@ -26,7 +26,7 @@ export class OrderSagaOrchestrator {
 		  initial: 'createPendingOrder',
 		  states: {
 			createPendingOrder: {
-				on: { 
+				on: { // we want to do an invoke here, because we do want to auto transition
 				  success: {
 					  target: 'removeInventory'
 				  },
@@ -85,18 +85,12 @@ export class OrderSagaOrchestrator {
 		const saga = this.sagas.get(params.orderId)
 		await this.ordersService.receiveOrder(params.orderId, params.productId, params.quantity, saga.getPersistedSnapshot())
 	}
-
 	private async createPendingOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-
-	private shipOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-
 	private removeInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-
 	private removeInventoryActionRollback(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private orderRecievedRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-
+	private shipOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 	private shipOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
 	private confirmOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
