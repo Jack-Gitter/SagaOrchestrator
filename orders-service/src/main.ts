@@ -1,8 +1,9 @@
 import { DataSource } from "typeorm";
-import { OrderSagaOrchestrator } from "./orders/orchestrator/orchestrator"
 import 'dotenv/config'
 import "reflect-metadata"
 import { randomUUID } from "node:crypto";
+import { OrderSagaOrchestrator } from "./orders/orchestrator/orchestrator";
+import { OrdersService } from "./orders/orders.service";
 
 const main = async () => {
 
@@ -15,7 +16,9 @@ const main = async () => {
 		database: process.env.PG_DATABASE,
 	})
 
-	const saga = new OrderSagaOrchestrator(datasource);
+	const ordersService = new OrdersService(datasource);
+
+	const saga = new OrderSagaOrchestrator(ordersService);
 
 	saga.initializeOrderAction(randomUUID(), 2, 3)
 
