@@ -1,1 +1,1 @@
-orderReceived -> reserveInventory -> shipOrder -> removeInventory -> confirmOrder
+orderReceived -> removeInventory -> shipOrder -> confirmOrder
