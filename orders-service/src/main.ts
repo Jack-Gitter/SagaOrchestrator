@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { OrderSagaOrchestrator } from "./orchestrator/orchestrator"
+import { OrderSagaOrchestrator } from "./orders/orchestrator/orchestrator"
 import 'dotenv/config'
 import "reflect-metadata"
 import { randomUUID } from "node:crypto";
