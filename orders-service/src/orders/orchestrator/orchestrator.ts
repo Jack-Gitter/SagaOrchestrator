@@ -1,12 +1,14 @@
 import { UUID } from "node:crypto";
+import { Snapshot } from "src/db/entities/snapshot.entity";
 import { OrdersService } from "src/orders/orders.service";
+import { DataSource } from "typeorm";
 import {setup, Actor, createActor, fromPromise, raise, AnyActorLogic, } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
 	private sagas = new Map<UUID, Actor<AnyActorLogic>>();
 
-	constructor(private ordersService: OrdersService) {}
+	constructor(private ordersService: OrdersService, private datasource: DataSource) {}
 
 	initializeOrderAction(orderId: UUID, productId: number, quantity: number) {
 
@@ -69,8 +71,15 @@ export class OrderSagaOrchestrator {
 	}
 
 	private createPendingOrderActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
-		console.log('creating pending order step')
+		console.log('Entering Create Pending Order Step')
+
 		const saga = this.sagas.get(input.orderId)
+		const snapshot = saga.getPersistedSnapshot()
+
+		const snapshotRepository = this.datasource.getRepository(Snapshot)
+		const snapshotEntity = new Snapshot(input.orderId, snapshot)
+		await snapshotRepository.save(snapshotEntity)
+
 		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
 	}
 

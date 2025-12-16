@@ -9,7 +9,8 @@ Outbox polling, sends message to Inventory Service
 
 2) RemoveInventory
 	a) We are in the waiting for inventory stage
-	b) Once the message handler (outside of saga) receives the message, it transitions out out of that state, and sends the message to the handleMessage state
+	b) Once the message handler (outside of saga) receives the message, it writes the new state to the database, and then it transitions out out of that state into success or failure state, and then acks the message.
+	c) if the app crashes before it transitions, that is ok. we come back up in that state, and then are able to read the message, and transition again, and then ack
 	c) The handle message state gets the message, and if it is successful then 
 	
 
