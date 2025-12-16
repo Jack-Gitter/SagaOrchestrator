@@ -20,6 +20,7 @@ export class OrderSagaOrchestrator {
 		  actors: {
 			  createPendingOrderActor: fromPromise(this.createPendingOrderActor),
 			  handleRemoveInventoryResponse: fromPromise(this.handleRemoveInventoryResponse),
+			  persistState: fromPromise()
 		  }
 		})
 
@@ -38,12 +39,13 @@ export class OrderSagaOrchestrator {
 				},
 			},
 			removeInventory: {
-				on: {
-					SUCCESS: 'complete'
-				},
 				initial: 'waitingForResponse',
 				states: {
 					waitingForResponse: {
+						invoke: {
+							src: 'persistState'
+							input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity })
+						},
 						on: {
 							INVENTORY_REMOVE_SUCCESS: { target: 'handleInventoryRemoveSuccess' } 
 						}
@@ -57,7 +59,10 @@ export class OrderSagaOrchestrator {
 							}
 						}
 					},
-				}
+				},
+				on: {
+					SUCCESS: 'complete'
+				},
 			},
 			complete: { type: 'final' },
 			error: { type: 'final' }
@@ -70,17 +75,20 @@ export class OrderSagaOrchestrator {
 
 	}
 
-	private createPendingOrderActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
-		console.log('Entering Create Pending Order Step')
-
+	private persistState = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => {
 		const saga = this.sagas.get(input.orderId)
 		const snapshot = saga.getPersistedSnapshot()
 
 		const snapshotRepository = this.datasource.getRepository(Snapshot)
 		const snapshotEntity = new Snapshot(input.orderId, snapshot)
 		await snapshotRepository.save(snapshotEntity)
+	}
+	private createPendingOrderActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
+		console.log('Entering Create Pending Order Step')
 
-		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
+		await this.persistState({input})
+
+		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity)
 	}
 
 	private handleRemoveInventoryResponse = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => {}

@@ -5,3 +5,7 @@ MUST FIX
 2) make listening for messages not apart of the state machine, and it has to see orderId and invoke the right step
 3) make services that do the database persistence and stuff, state machine shouldnt do it directly. Like OrdersService and maybe InventoryService that sends the rabbitmq message
 
+
+general practices: 
+1) whenever we are transitioning into a state, we should always initiatlly invoke an action that is going to write the state to the database
+2) don't actually do any work within the orchestrator. It should just tell other people what to do
