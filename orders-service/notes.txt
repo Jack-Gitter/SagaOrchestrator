@@ -6,6 +6,3 @@ MUST FIX
 3) make services that do the database persistence and stuff, state machine shouldnt do it directly. Like OrdersService and maybe InventoryService that sends the rabbitmq message
 
 I want to transition into the RemovingInventory state right away, but only trigger specific actions once our message comes back 
-
-
-

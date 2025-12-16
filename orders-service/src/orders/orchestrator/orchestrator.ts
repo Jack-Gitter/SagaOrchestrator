@@ -1,6 +1,6 @@
 import { UUID } from "node:crypto";
 import { OrdersService } from "src/orders/orders.service";
-import {setup, Actor, createActor, } from "xstate";
+import {setup, Actor, createActor, fromPromise, } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
@@ -16,7 +16,10 @@ export class OrderSagaOrchestrator {
 			context: {} as { orderId: UUID, productId: number, quantity: number},
 		  },
 		  actions: {
-			  example: () => {}
+			  removeInventoryAction: this.removeInventoryAction
+		  },
+		  actors: {
+			  createPendingOrderActor: fromPromise(this.createPendingOrderActor)
 		  }
 		})
 
@@ -26,16 +29,22 @@ export class OrderSagaOrchestrator {
 		  initial: 'createPendingOrder',
 		  states: {
 			createPendingOrder: {
-				on: { // we want to do an invoke here, because we do want to auto transition
-				  success: {
-					  target: 'removeInventory'
-				  },
-				  failure: 'error'
+				invoke: {
+					src: 'createPendingOrderActor',
+					input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity }),
+					onDone: {
+					  target: 'removeInventory',
+					},
+					onError: {
+					  target: 'error',
+					},
 				},
 			},
 			removeInventory: {
 				on: { 
-				  success: {actions: [{type: 'example', params: {}}]}, 
+				  success: {
+					  actions: [{type: 'removeInventoryAction', params: {orderId, productId, quantity}}]
+				  }, 
 				  failure: 'createPendingOrderRollback'
 				},
 			},
@@ -51,13 +60,15 @@ export class OrderSagaOrchestrator {
 
 	}
 
-	private async createPendingOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
-		const saga = this.sagas.get(params.orderId)
-		await this.ordersService.receiveOrder(params.orderId, params.productId, params.quantity, saga.getPersistedSnapshot())
+	private async createPendingOrderActor({input}: {input: {orderId: UUID, productId: number, quantity: number}}) {
+		const saga = this.sagas.get(input.orderId)
+		await this.ordersService.receiveOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
 	}
+	private removeInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
+	}
+
 	private async createPendingOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private removeInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 	private removeInventoryActionRollback(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
 	private shipOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
