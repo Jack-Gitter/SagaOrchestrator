@@ -64,11 +64,9 @@ export class OrderSagaOrchestrator {
 		const saga = this.sagas.get(input.orderId)
 		await this.ordersService.receiveOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
 	}
-	private removeInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
-	}
-
 	private async createPendingOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
+	private removeInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 	private removeInventoryActionRollback(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
 	private shipOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
