@@ -1,1 +1,15 @@
 orderReceived -> removeInventory -> shipOrder -> confirmOrder
+
+1) CreatePendingOrder 
+	a) just create the order, outbox message, inbox record, and persist state all together in a transaction. 
+	b) once this is done, transition to removeInventory
+	c) If this fails, then response to user and done
+
+Outbox polling, sends message to Inventory Service
+
+2) RemoveInventory
+	a) We are in the waiting for inventory stage
+	b) Once the message handler (outside of saga) receives the message, it transitions out out of that state, and sends the message to the handleMessage state
+	c) The handle message state gets the message, and if it is successful then 
+	
+

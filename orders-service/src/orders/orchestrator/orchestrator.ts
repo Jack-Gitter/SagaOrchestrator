@@ -1,10 +1,10 @@
 import { UUID } from "node:crypto";
 import { OrdersService } from "src/orders/orders.service";
-import {setup, Actor, createActor, fromPromise, } from "xstate";
+import {setup, Actor, createActor, fromPromise, raise, AnyActorLogic, } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
-	private sagas = new Map<UUID, Actor<any>>();
+	private sagas = new Map<UUID, Actor<AnyActorLogic>>();
 
 	constructor(private ordersService: OrdersService) {}
 
@@ -12,15 +12,12 @@ export class OrderSagaOrchestrator {
 
 		const orderMachineSetup = setup({
 		  types: {
-			events: {} as { type: 'success' } | { type: 'failure' },
+			events: {} as { type: 'INVENTORY_RESPONSE_ARRIVED' } | { type: 'INVENTORY_REMOVE_SUCCESS' } | { type: 'SUCCESS' },
 			context: {} as { orderId: UUID, productId: number, quantity: number},
 		  },
-		  actions: {
-			  removeInventoryAction: this.removeInventoryAction,
-			  removeInventoryFailedAction: this.removeInventoryFailedAction,
-		  },
 		  actors: {
-			  createPendingOrderActor: fromPromise(this.createPendingOrderActor)
+			  createPendingOrderActor: fromPromise(this.createPendingOrderActor),
+			  handleRemoveInventoryResponse: fromPromise(this.handleRemoveInventoryResponse),
 		  }
 		})
 
@@ -33,26 +30,35 @@ export class OrderSagaOrchestrator {
 				invoke: {
 					src: 'createPendingOrderActor',
 					input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity }),
-					onDone: {
+					onDone: { 
 					  target: 'removeInventory',
-					},
-					onError: {
-					  target: 'error',
 					},
 				},
 			},
 			removeInventory: {
-				on: { 
-				  success: {
-					  actions: [{type: 'removeInventoryAction', params: {orderId, productId, quantity}}] // write next message to outbox and persist state
-				  }, 
-				  failure: {
-					  actions: [{type: 'removeInventoryFailedAction', params: {orderId, productId, quantity}}] // write state to outbox and transition
-				  }
+				on: {
+					SUCCESS: 'complete'
 				},
+				initial: 'waitingForResponse',
+				states: {
+					waitingForResponse: {
+						on: {
+							INVENTORY_REMOVE_SUCCESS: { target: 'handleInventoryRemoveSuccess' } 
+						}
+					},
+					handleInventoryRemoveSuccess: {
+						invoke: {
+							src: 'handleRemoveInventoryResponse',
+							input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity }),
+							onDone: {
+								actions: raise({type: "INVENTORY_REMOVE_SUCCESS"})
+							}
+						}
+					},
+				}
 			},
-			complete: {type: 'final'},
-			error: {type: 'final'}
+			complete: { type: 'final' },
+			error: { type: 'final' }
 		  },
 		});
 
@@ -65,18 +71,8 @@ export class OrderSagaOrchestrator {
 
 	private async createPendingOrderActor({input}: {input: {orderId: UUID, productId: number, quantity: number}}) {
 		const saga = this.sagas.get(input.orderId)
-		await this.ordersService.receiveOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
+		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
 	}
-	private async createPendingOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
-	private removeInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-	private removeInventoryFailedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-	private removeInventoryActionRollback(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-
-	private shipOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-	private shipOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-
-	private confirmOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
-
-
+	private async handleRemoveInventoryResponse({input}: {input: {orderId: UUID, productId: number, quantity: number}}) {}
 }
