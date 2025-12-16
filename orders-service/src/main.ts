@@ -26,7 +26,7 @@ const main = async () => {
 	const ordersService = new OrdersService(datasource);
 	const inventoryService = new InventoryService(datasource)
 
-	const saga = new OrderSagaOrchestrator(ordersService, inventoryService, datasource);
+	const saga = new OrderSagaOrchestrator(ordersService, inventoryService);
 
 	saga.initializeOrderAction(randomUUID(), 2, 3)
 
