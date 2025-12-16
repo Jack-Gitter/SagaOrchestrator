@@ -1,28 +1,2 @@
 orderReceived -> removeInventory -> shipOrder -> confirmOrder
 
-1) CreatePendingOrder 
-	a) persist state
-		(crash-check) nothing, come back online and process everything
-	a) just create the order, outbox message, inbox record, in a transaction. 
-		(crash-check) if we crash after, we come back online, check the inbox record, and all good
-	b) transition to removeInventory
-
-Outbox polling, sends message to Inventory Service
-
-2) RemoveInventory
-	3) Waiting for response
-			(crash-check) if we crash before persisting state, we are in CreatePendingOrder. This will check the inbox, and transition directly back here
-		a) Persist state
-			(crash-check) come back online, still waiting for message. No problem
-		b) External message handler gets message, persists inbox message
-			(crash-check) this is fine, we come back up, get the message, check the inbox, do nothing besides ack message
-		c) acks message, then transitions into proper state
-			(crash-check) before persisting new state. This is ok, we come back online in the previous state, check inbox, and transition into this state
-		c) persist new state
-
-
-
-
-the key is that for each state that receives a message, I need to transition into the next state and persist that BEFORE i ack the message. Then if i crash, my message handler will just check the inbox, ack the message automatically. 
-
-
