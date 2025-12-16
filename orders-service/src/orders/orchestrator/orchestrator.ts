@@ -83,6 +83,7 @@ export class OrderSagaOrchestrator {
 		const snapshotEntity = new Snapshot(input.orderId, snapshot)
 		await snapshotRepository.save(snapshotEntity)
 	}
+
 	private createPendingOrderActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
 		console.log('Entering Create Pending Order Step')
 
