@@ -20,7 +20,7 @@ export class OrderSagaOrchestrator {
 		  actors: {
 			  createPendingOrderActor: fromPromise(this.createPendingOrderActor),
 			  handleRemoveInventoryResponse: fromPromise(this.handleRemoveInventoryResponse),
-			  persistState: fromPromise()
+			  persistState: fromPromise(this.persistState)
 		  }
 		})
 
@@ -43,8 +43,8 @@ export class OrderSagaOrchestrator {
 				states: {
 					waitingForResponse: {
 						invoke: {
-							src: 'persistState'
-							input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity })
+							src: 'persistState',
+							input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity }),
 						},
 						on: {
 							INVENTORY_REMOVE_SUCCESS: { target: 'handleInventoryRemoveSuccess' } 
