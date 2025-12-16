@@ -26,18 +26,18 @@ export class OrderSagaOrchestrator {
 		  },
 		})
 
-		const createPendingOrder = this.setStep('createPendingOrderAction','reserveInventory', 'error')
+		const createPendingOrder = this.setStep('createPendingOrderAction','removeInventory', 'error')
 		const createPendingOrderRollback = this.setStep('createPendingOrderRollbackAction', 'final', 'error')
-		const removeInventory = this.setStep('removeInventoryAction', 'confirmOrder', 'shipOrderRollback')
-		const removeInventoryRollback = this.setStep('removeInventoryActionRollback', 'shipOrderRollback', 'error')
-		const shipOrder = this.setStep('shipOrderAction', 'removeInventory', 'inventoryReserveRollback')
-		const shipOrderRollback = this.setStep('shipOrderRollbackAction', 'reserveInventoryRollback', 'error')
-		const confirmOrder = this.setStep('confirmOrderAction', 'final', 'removeInventoryAction')
+		const removeInventory = this.setStep('removeInventoryAction', 'shipOrder', 'createPendingOrderRollback')
+		const removeInventoryRollback = this.setStep('removeInventoryActionRollback', 'createPendingOrderRollback', 'error')
+		const shipOrder = this.setStep('shipOrderAction', 'confirmOrder', 'removeInventoryRollback')
+		const shipOrderRollback = this.setStep('shipOrderRollbackAction', 'removeInventoryRollback', 'error')
+		const confirmOrder = this.setStep('confirmOrderAction', 'final', 'shipOrderRollback')
 
 		const orderMachine = orderMachineSetup.createMachine({
 		  id: orderId.toString(),
 		  context: { orderId: orderId, productId: productId, quantity: quantity },
-		  initial: 'orderReceived',
+		  initial: 'createPendingOrder',
 		  states: {
 			createPendingOrder,
 			createPendingOrderRollback,
@@ -58,7 +58,7 @@ export class OrderSagaOrchestrator {
 
 	}
 
-	private setStep(type: string, success: string, failure: string): any {
+	private setStep(type: string, successTarget: string, failureTarget: string): any {
 	  return {
 	    entry: {
 		  type,
@@ -69,8 +69,8 @@ export class OrderSagaOrchestrator {
 		  })
 	    },
 	    on: { 
-		  success,
-		  failure,
+		  success: {target: successTarget},
+		  failure: {target: failureTarget},
 	    },
 	  }
 	}
