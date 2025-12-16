@@ -62,17 +62,17 @@ export class OrderSagaOrchestrator {
 		  },
 		});
 
-
 		const actor = createActor(orderMachine);
-		actor.start()
 		this.sagas.set(orderId, actor)
+		actor.start()
 
 	}
 
-	private async createPendingOrderActor({input}: {input: {orderId: UUID, productId: number, quantity: number}}) {
+	private createPendingOrderActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
+		console.log('creating pending order step')
 		const saga = this.sagas.get(input.orderId)
 		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
 	}
 
-	private async handleRemoveInventoryResponse({input}: {input: {orderId: UUID, productId: number, quantity: number}}) {}
+	private handleRemoveInventoryResponse = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => {}
 }

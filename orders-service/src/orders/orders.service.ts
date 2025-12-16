@@ -1,9 +1,9 @@
 import { UUID } from "node:crypto";
-import { InboxMessage } from "src/db/entities/inbox.entity";
-import { ReserveInventoryOutboxMessage } from "src/db/entities/reserve-inventory-outbox-message.entity";
-import { Snapshot } from "src/db/entities/snapshot.entity";
-import { Order } from "src/db/order.entity";
-import { MESSAGE_TYPE } from "src/db/types";
+import { InboxMessage } from "../db/entities/inbox.entity";
+import { ReserveInventoryOutboxMessage } from "../db/entities/reserve-inventory-outbox-message.entity";
+import { Snapshot } from "../db/entities/snapshot.entity";
+import { Order } from "../db/order.entity";
+import { MESSAGE_TYPE } from "../db/types";
 import { DataSource } from "typeorm";
 import { Snapshot as SagaSnapshot} from "xstate";
 
