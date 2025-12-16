@@ -1,9 +1,11 @@
-1) Check on the state machine transfers
-2) Read through the documentation, understand all actors, Invoke, Spawn, etc
-3) Try
-
+Do not use entry and exit, use custom transitions with promise actions and invoke...
 
 MUST FIX
 1) make outbox polling not apart of state machine
 2) make listening for messages not apart of the state machine, and it has to see orderId and invoke the right step
 3) make services that do the database persistence and stuff, state machine shouldnt do it directly. Like OrdersService and maybe InventoryService that sends the rabbitmq message
+
+I want to transition into the RemovingInventory state right away, but only trigger specific actions once our message comes back 
+
+
+

@@ -141,24 +141,6 @@ export class OrderSagaOrchestrator {
 
 	}
 
-	private setStep(type: string, successTarget: string, failureTarget: string): any {
-	  return {
-	    entry: {
-		  type,
-		  params: ({context}) => ({
-		    orderId: context.orderId,
-		    productId: context.productId,
-		    quantity: context.quantity,
-		  })
-	    },
-	    on: { 
-		  success: {target: successTarget},
-		  failure: {target: failureTarget},
-	    },
-	  }
-	}
-
-
 	private async createPendingOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		const saga = this.sagas.get(params.orderId)
 		await this.ordersService.receiveOrder(params.orderId, params.productId, params.quantity, saga.getPersistedSnapshot())
