@@ -1,16 +1,28 @@
 orderReceived -> removeInventory -> shipOrder -> confirmOrder
 
 1) CreatePendingOrder 
-	a) just create the order, outbox message, inbox record, and persist state all together in a transaction. 
-	b) once this is done, transition to removeInventory
-	c) If this fails, then response to user and done
+	a) persist state
+		(crash-check) nothing, come back online and process everything
+	a) just create the order, outbox message, inbox record, in a transaction. 
+		(crash-check) if we crash after, we come back online, check the inbox record, and all good
+	b) transition to removeInventory
 
 Outbox polling, sends message to Inventory Service
 
 2) RemoveInventory
-	a) We are in the waiting for inventory stage
-	b) Once the message handler (outside of saga) receives the message, it writes the new state to the database, and then it transitions out out of that state into success or failure state, and then acks the message.
-	c) if the app crashes before it transitions, that is ok. we come back up in that state, and then are able to read the message, and transition again, and then ack
-	c) The handle message state gets the message, and if it is successful then 
-	
+	3) Waiting for response
+			(crash-check) if we crash before persisting state, we are in CreatePendingOrder. This will check the inbox, and transition directly back here
+		a) Persist state
+			(crash-check) come back online, still waiting for message. No problem
+		b) External message handler gets message, persists inbox message
+			(crash-check) this is fine, we come back up, get the message, check the inbox, do nothing besides ack message
+		c) acks message, then transitions into proper state
+			(crash-check) before persisting new state. This is ok, we come back online in the previous state, check inbox, and transition into this state
+		c) persist new state
+
+
+
+
+The KEY is that for each state that receives a message, we should check the inbox at the start to make sure we have not processed this message before. 
+If we have, then we simply just move to the next state based on the message?
 

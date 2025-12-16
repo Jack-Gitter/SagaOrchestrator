@@ -10,10 +10,13 @@ export class InboxMessage {
 	@Column({type: 'enum', enum: MESSAGE_TYPE})
 	messageType: MESSAGE_TYPE
 
+	@Column()
+	success: boolean
 
-	constructor(orderId: UUID, messageType: MESSAGE_TYPE) {
+	constructor(orderId: UUID, messageType: MESSAGE_TYPE, success: boolean) {
 		this.orderId = orderId
 		this.messageType = messageType
+		this.success = success
 	}
 
 
