@@ -1,6 +1,1 @@
-1) 
-check inbox for message received
-write the order, outbox message, CURRENT saga state, and inbox message to the database all at the same time. 
-try to transition the state machine
-If we crash here, its ok. We will come back online, check the inbox, skip insertion, and move onto the next state
-
+1) We need to change to using Invoke, so that the state machine can await the function
