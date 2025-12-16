@@ -33,40 +33,10 @@ export class OrderSagaOrchestrator {
 				  failure: 'error'
 				},
 			},
-			createPendingOrderRollback: {
-				on: { 
-				  success: 'complete',
-				  failure: 'error'
-				},
-			},
 			removeInventory: {
 				on: { 
-				  success: {actions: [{type: 'example', params: {}}]}, //'shipOrder', // instead of transitioning, call some actions?
+				  success: {actions: [{type: 'example', params: {}}]}, 
 				  failure: 'createPendingOrderRollback'
-				},
-			},
-			removeInventoryRollback: {
-				on: { 
-				  success: 'createPendingOrderRollback',
-				  failure: 'error'
-				},
-			},
-			shipOrder: {
-				on: { 
-				  success: 'confirmOrder',
-				  failure: 'removeInventoryRollback'
-				},
-			},
-			shipOrderRollback: {
-				on: { 
-				  success: 'removeInventoryRollback',
-				  failure: 'error'
-				},
-			},
-			confirmOrder: {
-				on: { 
-				  success: 'complete',
-				  failure: 'shipOrderRollback'
 				},
 			},
 			complete: {type: 'final'},
