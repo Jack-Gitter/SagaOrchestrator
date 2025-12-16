@@ -70,7 +70,6 @@ export class OrderSagaOrchestrator {
 	}
 
 	private setStep(type: string, success: string, failure: string): any {
-		const 
 	  return {
 	    entry: {
 		  type,
