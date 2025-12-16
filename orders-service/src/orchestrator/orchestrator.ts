@@ -21,7 +21,7 @@ export class OrderSagaOrchestrator {
 			context: {} as { orderId: UUID, productId: number, quantity: number},
 		  },
 		  actions: { 
-			  orderRecievedAction: this.orderRecievedAction,
+			  orderReceivedAction: this.orderReceivedAction,
 			  reserveInventoryAction: this.reserveInventoryAction,
 			  shipOrderAction: this.shipOrderAction,
 			  shipOrderRollbackAction: this.shipOrderRollbackAction,
@@ -70,6 +70,7 @@ export class OrderSagaOrchestrator {
 	}
 
 	private setStep(type: string, success: string, failure: string): any {
+		const 
 	  return {
 	    entry: {
 		  type,
@@ -87,7 +88,7 @@ export class OrderSagaOrchestrator {
 	}
 
 
-	private async orderRecievedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
+	private async orderReceivedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		console.log("entering the order received action")
 		const saga = this.sagas.get(params.orderId)
 		const inboxRepository = this.datasource.getRepository(InboxMessage)
