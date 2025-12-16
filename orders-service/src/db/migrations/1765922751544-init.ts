@@ -1,11 +1,11 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Init1765920492668 implements MigrationInterface {
-    name = 'Init1765920492668'
+export class Init1765922751544 implements MigrationInterface {
+    name = 'Init1765922751544'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TYPE "public"."inbox_messagetype_enum" AS ENUM('createPendingOrder')`);
-        await queryRunner.query(`CREATE TABLE "inbox" ("orderId" uuid NOT NULL, "messageType" "public"."inbox_messagetype_enum" NOT NULL, CONSTRAINT "PK_7b0d4f403b0c1132093b1d94349" PRIMARY KEY ("orderId"))`);
+        await queryRunner.query(`CREATE TABLE "inbox" ("orderId" uuid NOT NULL, "messageType" "public"."inbox_messagetype_enum" NOT NULL, "success" boolean NOT NULL, CONSTRAINT "PK_7b0d4f403b0c1132093b1d94349" PRIMARY KEY ("orderId"))`);
         await queryRunner.query(`CREATE TABLE "reserve_inventory_outbox_messages" ("orderId" uuid NOT NULL, "quantity" integer NOT NULL, "productId" integer NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_cc15550cf8189fddfd06549b285" PRIMARY KEY ("orderId"))`);
         await queryRunner.query(`CREATE TABLE "snapshots" ("orderId" uuid NOT NULL, "snapshot" jsonb NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_5aa00ddf013b36d4f7cb19076de" PRIMARY KEY ("orderId"))`);
         await queryRunner.query(`CREATE TYPE "public"."orders_status_enum" AS ENUM('pending', 'canceled', 'fulfilled')`);

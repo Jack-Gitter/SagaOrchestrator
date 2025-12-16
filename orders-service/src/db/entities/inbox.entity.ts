@@ -18,6 +18,4 @@ export class InboxMessage {
 		this.messageType = messageType
 		this.success = success
 	}
-
-
 }
