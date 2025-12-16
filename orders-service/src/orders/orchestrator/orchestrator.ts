@@ -54,6 +54,7 @@ export class OrderSagaOrchestrator {
 		const saga = this.sagas.get(input.orderId)
 		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
 	}
+
 	private handleInventoryReservationMessageActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
 		console.log('Handling Inventory Reservation Message')
 	}
