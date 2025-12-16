@@ -16,7 +16,8 @@ export class OrderSagaOrchestrator {
 			context: {} as { orderId: UUID, productId: number, quantity: number},
 		  },
 		  actions: {
-			  removeInventoryAction: this.removeInventoryAction
+			  removeInventoryAction: this.removeInventoryAction,
+			  removeInventoryFailedAction: this.removeInventoryFailedAction,
 		  },
 		  actors: {
 			  createPendingOrderActor: fromPromise(this.createPendingOrderActor)
@@ -43,9 +44,11 @@ export class OrderSagaOrchestrator {
 			removeInventory: {
 				on: { 
 				  success: {
-					  actions: [{type: 'removeInventoryAction', params: {orderId, productId, quantity}}]
+					  actions: [{type: 'removeInventoryAction', params: {orderId, productId, quantity}}] // write next message to outbox and persist state
 				  }, 
-				  failure: 'createPendingOrderRollback'
+				  failure: {
+					  actions: [{type: 'removeInventoryFailedAction', params: {orderId, productId, quantity}}] // write state to outbox and transition
+				  }
 				},
 			},
 			complete: {type: 'final'},
@@ -67,6 +70,7 @@ export class OrderSagaOrchestrator {
 	private async createPendingOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
 	private removeInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
+	private removeInventoryFailedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 	private removeInventoryActionRollback(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
 	private shipOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
