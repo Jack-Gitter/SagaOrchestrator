@@ -1,15 +1,14 @@
 import { randomUUID, UUID } from "node:crypto";
-import { Snapshot } from "src/db/entities/snapshot.entity";
 import { InventoryService } from "src/inventory/inventory.service";
 import { OrdersService } from "src/orders/orders.service";
 import { DataSource } from "typeorm";
-import {setup, Actor, createActor, fromPromise, raise, AnyActorLogic, } from "xstate";
+import {setup, Actor, createActor, fromPromise, AnyActorLogic } from "xstate";
 
 export class OrderSagaOrchestrator {
 	
 	private sagas = new Map<UUID, Actor<AnyActorLogic>>();
 
-	constructor(private ordersService: OrdersService, private inventoryService: InventoryService, private datasource: DataSource) {}
+	constructor(private ordersService: OrdersService, private inventoryService: InventoryService) {}
 
 	initializeOrderAction(orderId: UUID, productId: number, quantity: number) {
 
@@ -48,7 +47,6 @@ export class OrderSagaOrchestrator {
 		actor.start()
 
 	}
-
 
 	public inventoryResponseListener() {
 		const orderId = randomUUID()
