@@ -26,26 +26,109 @@ export class OrderSagaOrchestrator {
 		  },
 		})
 
-		const createPendingOrder = this.setStep('createPendingOrderAction','removeInventory', 'error')
-		const createPendingOrderRollback = this.setStep('createPendingOrderRollbackAction', 'final', 'error')
-		const removeInventory = this.setStep('removeInventoryAction', 'shipOrder', 'createPendingOrderRollback')
-		const removeInventoryRollback = this.setStep('removeInventoryActionRollback', 'createPendingOrderRollback', 'error')
-		const shipOrder = this.setStep('shipOrderAction', 'confirmOrder', 'removeInventoryRollback')
-		const shipOrderRollback = this.setStep('shipOrderRollbackAction', 'removeInventoryRollback', 'error')
-		const confirmOrder = this.setStep('confirmOrderAction', 'final', 'shipOrderRollback')
-
 		const orderMachine = orderMachineSetup.createMachine({
 		  id: orderId.toString(),
 		  context: { orderId: orderId, productId: productId, quantity: quantity },
 		  initial: 'createPendingOrder',
 		  states: {
-			createPendingOrder,
-			createPendingOrderRollback,
-			removeInventory,
-			removeInventoryRollback,
-			shipOrder,
-			shipOrderRollback,
-			confirmOrder,
+			createPendingOrder: {
+				entry: {
+					type: 'createPendingOrderAction',
+					params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				  })
+				},
+				on: { 
+				  success: 'removeInventory',
+				  failure: 'error'
+				},
+			},
+			createPendingOrderRollback: {
+				entry: {
+					type: 'createPendingOrderRollbackAction',
+					params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				  })
+				},
+				on: { 
+				  success: 'final',
+				  failure: 'error'
+				},
+			},
+			removeInventory: {
+				entry: {
+					type: 'removeInventoryAction',
+					params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				  })
+				},
+				on: { 
+				  success: 'shipOrder',
+				  failure: 'createPendingOrderRollback'
+				},
+			},
+			removeInventoryRollback: {
+				entry: {
+					type: 'removeInventoryActionRollback',
+					params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				  })
+				},
+				on: { 
+				  success: 'createPendingOrderRollback',
+				  failure: 'error'
+				},
+			},
+			shipOrder: {
+				entry: {
+					type: 'shipOrderAction',
+					params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				  })
+				},
+				on: { 
+				  success: 'confirmOrder',
+				  failure: 'removeInventoryRollback'
+				},
+			},
+			shipOrderRollback: {
+				entry: {
+					type: 'shipOrderRollbackAction',
+					params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				  })
+				},
+				on: { 
+				  success: 'removeInventoryRollback',
+				  failure: 'error'
+				},
+			},
+			confirmOrder: {
+				entry: {
+					type: 'confirmOrderAction',
+					params: ({context}) => ({
+					orderId: context.orderId,
+					productId: context.productId,
+					quantity: context.quantity,
+				  })
+				},
+				on: { 
+				  success: 'final',
+				  failure: 'shipOrderRollback'
+				},
+			},
 			final: {},
 			error: {}
 		  },
