@@ -1,5 +1,6 @@
 import { UUID } from "node:crypto";
 import { Snapshot } from "src/db/entities/snapshot.entity";
+import { InventoryService } from "src/inventory/inventory.service";
 import { OrdersService } from "src/orders/orders.service";
 import { DataSource } from "typeorm";
 import {setup, Actor, createActor, fromPromise, raise, AnyActorLogic, } from "xstate";
@@ -8,7 +9,7 @@ export class OrderSagaOrchestrator {
 	
 	private sagas = new Map<UUID, Actor<AnyActorLogic>>();
 
-	constructor(private ordersService: OrdersService, private datasource: DataSource) {}
+	constructor(private ordersService: OrdersService, private inventoryService: InventoryService, private datasource: DataSource) {}
 
 	initializeOrderAction(orderId: UUID, productId: number, quantity: number) {
 
@@ -48,6 +49,9 @@ export class OrderSagaOrchestrator {
 
 	}
 
+	public getActor(orderId: UUID) {
+		return this.sagas.get(orderId)
+	}
 
 	private handleOrderRequestActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
 		console.log('Handling Order Request')
@@ -57,6 +61,7 @@ export class OrderSagaOrchestrator {
 
 	private handleInventoryReservationMessageActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
 		console.log('Handling Inventory Reservation Message')
+		await this.inventoryService.handleInventoryResponse(input.orderId, input.productId, input.quantity)
 	}
 
 }
