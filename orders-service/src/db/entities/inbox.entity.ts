@@ -3,8 +3,8 @@ import { Column, Entity } from "typeorm";
 import { MESSAGE_TYPE } from "../types";
 
 @Entity('inbox')
-export class Inbox {
-	@Column('uuid')
+export class InboxMessage {
+	@Column({type: 'uuid', primary: true})
 	orderId: UUID
 
 	@Column({type: 'enum', enum: MESSAGE_TYPE})

@@ -3,7 +3,7 @@ import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
 
 @Entity('reserve_inventory_outbox_messages')
 export class ReserveInventoryOutboxMessage {
-	@Column('uuid')
+	@Column({type: 'uuid', primary: true})
 	orderId: UUID
 
 	@Column('int')

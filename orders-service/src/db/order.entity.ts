@@ -1,6 +1,6 @@
 import { UUID } from "node:crypto";
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { ORDER_STATUS } from "../types";
+import { ORDER_STATUS } from "./types";
 
 @Entity()
 export class Order {

@@ -9,10 +9,10 @@ const main = async () => {
 	const datasource = new DataSource({
 		type: 'postgres',
 		host: "localhost",
-		port: Number(process.env.PORT),
-		username: process.env.USERNAME,
-		password: process.env.PASSWORD,
-		database: process.env.DATABASE,
+		port: Number(process.env.PG_PORT),
+		username: process.env.PG_USERNAME,
+		password: process.env.PG_PASSWORD,
+		database: process.env.PG_DATABASE,
 	})
 
 	const saga = new OrderSagaOrchestrator(datasource);

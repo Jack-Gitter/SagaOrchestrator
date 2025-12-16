@@ -1,5 +1,5 @@
 import { UUID } from "node:crypto";
-import { Inbox } from "src/db/entities/inbox.entity";
+import { InboxMessage } from "src/db/entities/inbox.entity";
 import { Order } from "src/db/entities/order.entity";
 import { ReserveInventoryOutboxMessage } from "src/db/entities/reserve-inventory-outbox-message.entity";
 import { Snapshot } from "src/db/entities/snapshot.entity";
@@ -90,21 +90,21 @@ export class OrderSagaOrchestrator {
 	private async orderRecievedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		console.log("entering the order received action")
 		const saga = this.sagas.get(params.orderId)
-		const inboxRepository = this.datasource.getRepository(Inbox)
+		const inboxRepository = this.datasource.getRepository(InboxMessage)
 		if (await inboxRepository.findOneBy({orderId: params.orderId})) {
 			saga.send({type: 'success'})
 			return;
 		}
 		try {
 			await this.datasource.transaction(async (transaction) => {
-				const inboxRepository = transaction.getRepository(Inbox)
+				const inboxRepository = transaction.getRepository(InboxMessage)
 				const orderRepository = transaction.getRepository(Order)
 				const inventoryReserveRepository = transaction.getRepository(ReserveInventoryOutboxMessage)
 				const snapshotRepository = transaction.getRepository(Snapshot)
 
 				const order = new Order(params.orderId, params.quantity, params.productId)
 				const inventoryReserveMessage = new ReserveInventoryOutboxMessage(params.orderId, params.quantity, params.productId)
-				const inboxMessage = new Inbox(params.orderId, MESSAGE_TYPE.RECEIVE_ORDER);
+				const inboxMessage = new InboxMessage(params.orderId, MESSAGE_TYPE.RECEIVE_ORDER);
 				const snapshot = saga.getPersistedSnapshot()
 				const snapshotEntity = new Snapshot(params.orderId, snapshot)
 

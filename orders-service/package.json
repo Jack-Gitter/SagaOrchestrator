@@ -8,8 +8,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"mgrgen": ""
-	"mgrrun": ""
+    "mgrgen": "npx typeorm-ts-node-commonjs migration:generate -d src/db/datasource.ts",
+    "mgrrun": "npx typeorm-ts-node-commonjs migration:run -d src/db/datasource.ts"
   },
   "dependencies": {
     "amqplib": "^0.10.9",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "@types/node": "^25.0.2",
     "dotenv": "^17.2.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }
