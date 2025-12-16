@@ -12,7 +12,7 @@ export class OrdersService {
 
 	constructor(private datasource: DataSource) {}
 
-	async createPendingOrder(orderId: UUID, productId: number, quantity: number, snapshot: StateMachineSnapshot<unknown>) {
+	async handleOrderRequest(orderId: UUID, productId: number, quantity: number, snapshot: StateMachineSnapshot<unknown>) {
 		const inboxRepository = this.datasource.getRepository(InboxMessage)
 		if (await inboxRepository.findOneBy({orderId})) {
 			return;

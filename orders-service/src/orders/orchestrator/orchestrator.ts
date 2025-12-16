@@ -57,7 +57,7 @@ export class OrderSagaOrchestrator {
 	private handleOrderRequestActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
 		console.log('Handling Order Request')
 		const saga = this.sagas.get(input.orderId)
-		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
+		await this.ordersService.handleOrderRequest(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
 	}
 
 	private handleInventoryReservationMessageActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
