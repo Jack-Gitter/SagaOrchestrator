@@ -5,5 +5,5 @@ export enum ORDER_STATUS {
 }
 
 export enum MESSAGE_TYPE {
-	RECEIVE_ORDER = 'receive_order'
+	RECEIVE_ORDER = 'createPendingOrder'
 }
