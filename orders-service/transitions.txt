@@ -23,6 +23,6 @@ Outbox polling, sends message to Inventory Service
 
 
 
-The KEY is that for each state that receives a message, we should check the inbox at the start to make sure we have not processed this message before. 
-If we have, then we simply just move to the next state based on the message?
+the key is that for each state that receives a message, I need to transition into the next state and persist that BEFORE i ack the message. Then if i crash, my message handler will just check the inbox, ack the message automatically. 
+
 
