@@ -5,9 +5,9 @@ import { randomUUID } from "node:crypto";
 import { OrderSagaOrchestrator } from "./orders/orchestrator/orchestrator";
 import { OrdersService } from "./orders/orders.service";
 import { InboxMessage } from "./db/entities/inbox.entity";
-import { Order } from "./db/order.entity";
 import { Snapshot } from "./db/entities/snapshot.entity";
 import { ReserveInventoryOutboxMessage } from "./db/entities/reserve-inventory-outbox-message.entity";
+import { Order } from "./db/entities/order.entity";
 
 const main = async () => {
 
@@ -26,7 +26,7 @@ const main = async () => {
 
 	const ordersService = new OrdersService(datasource);
 
-	const saga = new OrderSagaOrchestrator(ordersService);
+	const saga = new OrderSagaOrchestrator(ordersService, datasource);
 
 	saga.initializeOrderAction(randomUUID(), 2, 3)
 
