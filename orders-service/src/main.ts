@@ -8,6 +8,7 @@ import { InboxMessage } from "./db/entities/inbox.entity";
 import { Snapshot } from "./db/entities/snapshot.entity";
 import { ReserveInventoryOutboxMessage } from "./db/entities/reserve-inventory-outbox-message.entity";
 import { Order } from "./db/entities/order.entity";
+import { InventoryService } from "./inventory/inventory.service";
 
 const main = async () => {
 
@@ -20,16 +21,14 @@ const main = async () => {
 		database: process.env.PG_DATABASE,
 		entities: [InboxMessage, Order, Snapshot, ReserveInventoryOutboxMessage]
 	})
-
 	await datasource.initialize()
-	console.log('database connected')
 
 	const ordersService = new OrdersService(datasource);
+	const inventoryService = new InventoryService(datasource)
 
-	const saga = new OrderSagaOrchestrator(ordersService, datasource);
+	const saga = new OrderSagaOrchestrator(ordersService, inventoryService, datasource);
 
 	saga.initializeOrderAction(randomUUID(), 2, 3)
-
 
 }
 

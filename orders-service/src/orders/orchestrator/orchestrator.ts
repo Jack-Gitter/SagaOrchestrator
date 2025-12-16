@@ -1,4 +1,4 @@
-import { UUID } from "node:crypto";
+import { randomUUID, UUID } from "node:crypto";
 import { Snapshot } from "src/db/entities/snapshot.entity";
 import { InventoryService } from "src/inventory/inventory.service";
 import { OrdersService } from "src/orders/orders.service";
@@ -49,8 +49,11 @@ export class OrderSagaOrchestrator {
 
 	}
 
-	public getActor(orderId: UUID) {
-		return this.sagas.get(orderId)
+
+	public inventoryResponseListener() {
+		const orderId = randomUUID()
+		const actor = this.sagas.get(orderId)
+		actor.send({type: ''})
 	}
 
 	private handleOrderRequestActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
