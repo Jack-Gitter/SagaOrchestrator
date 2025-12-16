@@ -4,18 +4,22 @@ import { ReserveInventoryOutboxMessage } from "../db/entities/reserve-inventory-
 import { MESSAGE_TYPE } from "../db/types";
 import { DataSource } from "typeorm";
 import { Order } from "../db/entities/order.entity";
+import { Snapshot as StateMachineSnapshot} from "xstate";
+import { Snapshot } from "src/db/entities/snapshot.entity";
 
 
 export class OrdersService {
 
 	constructor(private datasource: DataSource) {}
 
-	async createPendingOrder(orderId: UUID, productId: number, quantity: number) {
+	async createPendingOrder(orderId: UUID, productId: number, quantity: number, snapshot: StateMachineSnapshot<unknown>) {
 		const inboxRepository = this.datasource.getRepository(InboxMessage)
 		if (await inboxRepository.findOneBy({orderId})) {
 			return;
 		}
+
 		await this.datasource.transaction(async (transaction) => {
+			const snapshotRepository = this.datasource.getRepository(Snapshot)
 			const inboxRepository = transaction.getRepository(InboxMessage)
 			const orderRepository = transaction.getRepository(Order)
 			const inventoryReserveRepository = transaction.getRepository(ReserveInventoryOutboxMessage)
@@ -23,10 +27,12 @@ export class OrdersService {
 			const order = new Order(orderId, quantity, productId)
 			const inventoryReserveMessage = new ReserveInventoryOutboxMessage(orderId, quantity, productId)
 			const inboxMessage = new InboxMessage(orderId, MESSAGE_TYPE.RECEIVE_ORDER, true);
+			const snapshotEntity = new Snapshot(orderId, snapshot)
 
 			await orderRepository.save(order)
 			await inventoryReserveRepository.save(inventoryReserveMessage)
 			await inboxRepository.save(inboxMessage)
+			await snapshotRepository.save(snapshotEntity)
 		})
 	}
 }

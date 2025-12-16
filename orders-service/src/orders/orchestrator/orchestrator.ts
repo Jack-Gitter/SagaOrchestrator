@@ -48,19 +48,11 @@ export class OrderSagaOrchestrator {
 
 	}
 
-	private persistMachineState = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => {
-		const saga = this.sagas.get(input.orderId)
-		const snapshot = saga.getPersistedSnapshot()
-
-		const snapshotRepository = this.datasource.getRepository(Snapshot)
-		const snapshotEntity = new Snapshot(input.orderId, snapshot)
-		await snapshotRepository.save(snapshotEntity)
-	}
 
 	private handleOrderRequestActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
 		console.log('Handling Order Request')
-		await this.persistMachineState({input})
-		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity)
+		const saga = this.sagas.get(input.orderId)
+		await this.ordersService.createPendingOrder(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
 	}
 	private handleInventoryReservationMessageActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
 		console.log('Handling Inventory Reservation Message')
