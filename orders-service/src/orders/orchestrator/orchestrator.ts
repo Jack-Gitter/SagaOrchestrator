@@ -16,7 +16,7 @@ export class OrderSagaOrchestrator {
 			context: {} as { orderId: UUID, productId: number, quantity: number},
 		  },
 		  actions: { 
-			  orderReceivedAction: this.orderReceivedAction,
+			  createPendingOrderAction: this.createPendingOrderAction,
 			  reserveInventoryAction: this.reserveInventoryAction,
 			  shipOrderAction: this.shipOrderAction,
 			  shipOrderRollbackAction: this.shipOrderRollbackAction,
@@ -28,22 +28,22 @@ export class OrderSagaOrchestrator {
 		  },
 		})
 
-		const orderReceived = this.setStep('orderReceivedAction','reserveInventory', 'error')
+		const createPendingOrder = this.setStep('createPendingOrderAction','reserveInventory', 'error')
 		const reserveInventory = this.setStep('reserveInventoryAction','shipOrder', 'orderReceivedRollback')
 		const shipOrder = this.setStep('shipOrderAction', 'removeInventory', 'inventoryReserveRollback')
 		const removeInventory = this.setStep('removeInventoryAction', 'confirmOrder', 'shipOrderRollback')
 		const confirmOrder = this.setStep('confirmOrderAction', 'final', 'removeInventoryAction')
 		const removeInventoryAction = this.setStep('removeInventoryActionRollback', 'shipOrderRollback', 'error')
 		const shipOrderRollback = this.setStep('shipOrderRollbackAction', 'reserveInventoryRollback', 'error')
-		const reserveInventoryRollback = this.setStep('reserveInventoryRollbackAction', 'orderRecievedRollback', 'error')
-		const orderReceivedRollback = this.setStep('orderRecievedRollbackAction', 'final', 'error')
+		const reserveInventoryRollback = this.setStep('reserveInventoryRollbackAction', 'createPendingOrderRollback', 'error')
+		const createPendingOrderRollback = this.setStep('createPendingOrderRollbackAction', 'final', 'error')
 
 		const orderMachine = orderMachineSetup.createMachine({
 		  id: orderId.toString(),
 		  context: { orderId: orderId, productId: productId, quantity: quantity },
 		  initial: 'orderReceived',
 		  states: {
-			orderReceived,
+			createPendingOrder,
 			reserveInventory,
 			shipOrder,
 			removeInventory,
@@ -51,7 +51,7 @@ export class OrderSagaOrchestrator {
 			removeInventoryAction,
 			shipOrderRollback,
 			reserveInventoryRollback,
-			orderReceivedRollback,
+			createPendingOrderRollback,
 			final: {},
 			error: {}
 		  },
@@ -82,10 +82,12 @@ export class OrderSagaOrchestrator {
 	}
 
 
-	private async orderReceivedAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
+	private async createPendingOrderAction(_, params: {orderId: UUID, productId: number, quantity: number}) {
 		const saga = this.sagas.get(params.orderId)
 		await this.ordersService.receiveOrder(params.orderId, params.productId, params.quantity, saga.getPersistedSnapshot())
 	}
+
+	private async createPendingOrderRollbackAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
 	private reserveInventoryAction(_, params: {orderId: UUID, productId: number, quantity: number}) {}
 
