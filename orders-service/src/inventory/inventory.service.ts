@@ -15,7 +15,7 @@ export class InventoryService {
 		const snapshotRepository = this.datasource.getRepository(Snapshot)
 		const snap = await snapshotRepository.findOneBy({orderId})
 		if (snap?.state === STATE.HANDLE_INVENTORY_RESPONSE) {
-			console.log('already handled, skipping')
+			console.log('already handled inventory message, skipping')
 			return;
 		}
 		await this.datasource.transaction(async manager => {
