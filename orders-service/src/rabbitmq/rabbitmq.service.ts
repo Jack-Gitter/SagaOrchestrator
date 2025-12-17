@@ -28,13 +28,13 @@ export class RabbitMQService {
 		const actor = this.ordersSagaOrchestrator.getActor(orderId)
 		actor.send({type: 'inventoryReservationMessageReceived', message: {}, messageId: '123'})
 
-	  await waitFor(
-		actor, 
-		(state) => {
-		  return state.matches('handleInventoryReservationMessage') === false;
-		},
-		{ timeout: 30000 } 
-	  );
+		await waitFor(
+			actor, 
+			(state) => {
+				return state.matches('handleInventoryReservationMessage') === false;
+			},
+			{ timeout: 30000 } 
+		);
 
 	  // ack message here, or if we timed out then dont?
 	}

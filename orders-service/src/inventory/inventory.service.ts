@@ -16,7 +16,7 @@ export class InventoryService {
 			const snapshotRepository = this.datasource.getRepository(Snapshot)
 			const inboxRepository = transaction.getRepository(Inbox)
 
-			const outboxMessage = new Outbox(orderId, quantity, productId, OUTBOX_MESSAGE_TYPE.RESERVE_INVENTORY)
+			const outboxMessage = new Outbox(orderId, quantity, productId, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT)
 			const inboxMessage = new Inbox(orderId, INBOX_MESSAGE_TYPE.INVENTORY_REMOVE_RESPONSE, true);
 			const snapshotEntity = new Snapshot(orderId, snapshot)
 

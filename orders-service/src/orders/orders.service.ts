@@ -4,6 +4,7 @@ import { DataSource } from "typeorm";
 import { Order } from "../db/entities/order.entity";
 import { Snapshot as StateMachineSnapshot} from "xstate";
 import { Snapshot } from "../db/entities/snapshot.entity";
+import { OUTBOX_MESSAGE_TYPE } from "src/db/types";
 
 
 export class OrdersService {
@@ -17,7 +18,7 @@ export class OrdersService {
 			const inventoryReserveRepository = transaction.getRepository(Outbox)
 
 			const order = new Order(orderId, quantity, productId)
-			const inventoryReserveMessage = new Outbox(orderId, quantity, productId)
+			const inventoryReserveMessage = new Outbox(orderId, quantity, productId, OUTBOX_MESSAGE_TYPE.RESERVE_INVENTORY)
 			const snapshotEntity = new Snapshot(orderId, snapshot)
 
 			await orderRepository.save(order)
