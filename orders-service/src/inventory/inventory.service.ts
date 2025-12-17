@@ -9,7 +9,6 @@ export class InventoryService {
 
 	constructor(private datasource: DataSource) {}
 
-
 	async handleInventoryResponse(orderId: UUID, productId: number, quantity: number, message: any, messageId: any, snapshot: SagaSnapshot<unknown>) {
 		await this.datasource.transaction(async (transaction) => {
 			const snapshotRepository = this.datasource.getRepository(Snapshot)

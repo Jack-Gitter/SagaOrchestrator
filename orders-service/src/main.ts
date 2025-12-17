@@ -9,6 +9,7 @@ import { Snapshot } from "./db/entities/snapshot.entity";
 import { ReserveInventoryOutboxMessage } from "./db/entities/reserve-inventory-outbox-message.entity";
 import { Order } from "./db/entities/order.entity";
 import { InventoryService } from "./inventory/inventory.service";
+import { RabbitMQService } from "./rabbitmq/rabbitmq.service";
 
 const main = async () => {
 
@@ -26,9 +27,10 @@ const main = async () => {
 	const ordersService = new OrdersService(datasource);
 	const inventoryService = new InventoryService(datasource)
 
-	const saga = new OrderSagaOrchestrator(ordersService, inventoryService);
+	const orchestrator = new OrderSagaOrchestrator(ordersService, inventoryService);
+	const rabbitMQService = new RabbitMQService(orchestrator, datasource)
 
-	saga.initializeOrderAction(randomUUID(), 2, 3)
+	orchestrator.initializeOrderAction(randomUUID(), 2, 3)
 
 }
 
