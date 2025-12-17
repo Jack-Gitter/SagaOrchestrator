@@ -3,11 +3,12 @@ import { OutboxMessage } from '../db/entities/outbox.entity';
 import { OUTBOX_MESSAGE_TYPE } from '../db/types';
 import { DataSource } from 'typeorm';
 import { QUEUE } from './types';
+import { OrdersSagaOrchestrator } from 'src/orders/orchestrator/orders.orchestrator';
 
 export class RabbitMQService {
 
 	private channel: amqplib.Channel
-	constructor(private datasource: DataSource) {}
+	constructor(private datasource: DataSource, private orderSagaOrchestrator: OrdersSagaOrchestrator) {}
 
 	async init() {
 	  const connection = await amqplib.connect({
@@ -26,6 +27,17 @@ export class RabbitMQService {
 		this.channel.sendToQueue(queue, message)
 	}
 
+	listenForRemoveInventoryResponse() {
+		this.channel.consume(QUEUE.REMOVE_INVENTORY_RESPONSE, (msg) => {
+			if (msg !== null) {
+				console.log('Received:', msg.content.toString());
+				this.orderSagaOrchestrator.handleShippingResponseMessage()
+				// wait until the state machien work is done...
+				this.channel.ack(msg)
+			}
+		})
+	}
+	
 	pollOutbox() {
 		const outboxRepository = this.datasource.getRepository(OutboxMessage)
 		setInterval(async () => {
