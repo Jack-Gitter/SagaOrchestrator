@@ -1,6 +1,6 @@
 export enum QUEUE {
-	RESERVE_INVENTORY = 'reserve_inventory',
-	RESERVE_INVENTORY_RESPONSE = 'reserve_inventory_resposne',
+	REMOVE_INVENTORY = 'remove_inventory',
+	REMOVE_INVENTORY_RESPONSE = 'remove_inventory_response',
 	SHIP_ORDER = 'ship_order',
 	SHIP_ORDER_RESPONSE = 'ship_order_response'
 }

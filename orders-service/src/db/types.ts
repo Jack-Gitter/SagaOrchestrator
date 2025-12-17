@@ -10,6 +10,6 @@ export enum INBOX_MESSAGE_TYPE {
 }
 
 export enum OUTBOX_MESSAGE_TYPE {
-	RESERVE_INVENTORY = 'reserveInventory',
+	REMOVE_INVENTORY = 'removeInventory',
 	SHIP_PRODUCT = 'shipProduct'
 }

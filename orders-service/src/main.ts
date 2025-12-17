@@ -26,6 +26,7 @@ const main = async () => {
 	const orchestrator = new OrdersSagaOrchestrator(ordersService, datasource)
 	const rabbitMQService = new RabbitMQService(datasource)
 	await rabbitMQService.init()
+	rabbitMQService.pollOutbox()
 
 	const server = new Server(Number(process.env.APP_PORT), orchestrator)
 

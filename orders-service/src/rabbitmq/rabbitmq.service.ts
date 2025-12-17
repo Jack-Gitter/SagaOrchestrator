@@ -32,10 +32,11 @@ export class RabbitMQService {
 			const outboxMessages = await outboxRepository.find()
 			for (const outboxMessage of outboxMessages) {
 				switch (outboxMessage.messageType) {
-					case OUTBOX_MESSAGE_TYPE.RESERVE_INVENTORY: 
+					case OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY: 
+						console.log('sending remove inventory message')
 						const json = outboxMessage.toJson();
 						const buffer = Buffer.from(JSON.stringify(json))
-						this.channel.sendToQueue(QUEUE.RESERVE_INVENTORY, buffer)
+						this.channel.sendToQueue(QUEUE.REMOVE_INVENTORY, buffer)
 						break;
 					default: 
 						throw new Error('not supported yet')

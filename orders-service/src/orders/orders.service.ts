@@ -18,7 +18,7 @@ export class OrdersService {
 			const snapshotRepository = manager.getRepository(Snapshot)
 
 			const order = new Order(orderId, productId, quantity)
-			const outboxMessage = new OutboxMessage(orderId, productId, quantity, OUTBOX_MESSAGE_TYPE.RESERVE_INVENTORY)
+			const outboxMessage = new OutboxMessage(orderId, productId, quantity, OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
 			const sagaSnapshot = new Snapshot(orderId, snapshot)
 
 			await orderRepository.save(order)
