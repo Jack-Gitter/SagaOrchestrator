@@ -1,7 +1,7 @@
 import * as amqplib from 'amqplib'
 import { randomUUID } from 'node:crypto';
-import { InboxMessage } from 'src/db/entities/inbox.entity';
-import { OrderSagaOrchestrator } from 'src/orders/orchestrator/orchestrator';
+import { InboxMessage } from '../db/entities/inbox.entity';
+import { OrderSagaOrchestrator } from '../orders/orchestrator/orchestrator';
 import { DataSource } from 'typeorm';
 import { waitFor } from 'xstate';
 
