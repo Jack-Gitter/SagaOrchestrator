@@ -28,6 +28,8 @@ export class InventoryService {
 			await snapshotRepository.save(snapshotEntity)
 		})
 
+		// we have to ack the message after we transition state somehow
+
 	}
 
 }

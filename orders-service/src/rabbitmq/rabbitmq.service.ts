@@ -1,6 +1,7 @@
 import * as amqplib from 'amqplib'
 import { randomUUID } from 'node:crypto';
 import { OrderSagaOrchestrator } from 'src/orders/orchestrator/orchestrator';
+import { waitFor } from 'xstate';
 
 export class RabbitMQService {
 
@@ -17,6 +18,16 @@ export class RabbitMQService {
 		const orderId = randomUUID()
 		const actor = this.ordersSagaOrchestrator.getActor(orderId)
 		actor.send({type: 'inventoryReservationMessageReceived', message: {}, messageId: '123'})
+
+	  await waitFor(
+		actor, 
+		(state) => {
+		  return state.matches('handleInventoryReservationMessage') === false;
+		},
+		{ timeout: 30000 } 
+	  );
+
+	  // ack message here
 	}
 
 }
