@@ -1,10 +1,13 @@
 import { UUID } from "node:crypto";
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { OUTBOX_MESSAGE_TYPE } from "../types";
 
 @Entity('outbox')
-export class Outbox {
-	@Column({type: 'uuid', primary: true})
+export class OutboxMessage {
+	@PrimaryGeneratedColumn('uuid')
+	id: UUID
+
+	@Column({type: 'uuid'})
 	orderId: UUID
 
 	@Column('int')
