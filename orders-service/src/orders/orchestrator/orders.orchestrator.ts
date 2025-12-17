@@ -68,6 +68,7 @@ export class OrdersSagaOrchestrator {
 				const orderId = actor.getSnapshot().context.orderId
 				this.actors.set(orderId, actor)
 				actor.start()
+				console.log(`Restored saga from snapshot for saga with orderId ${orderId}`)
 			})
 		}
 	}
