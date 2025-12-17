@@ -27,7 +27,7 @@ export class RabbitMQService {
 		{ timeout: 30000 } 
 	  );
 
-	  // ack message here
+	  // ack message here, or if we timed out then dont?
 	}
 
 }
