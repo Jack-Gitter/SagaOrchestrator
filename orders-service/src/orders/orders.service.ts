@@ -12,6 +12,11 @@ export class OrdersService {
 	constructor(private datasource: DataSource) {}
 
 	createOrder = async (orderId: UUID, productId: number, quantity: number, snapshot: SagaSnapshot<unknown>) => {
+		const orderRepository = this.datasource.getRepository(Order)
+		const order = await orderRepository.findOneBy({orderId})
+		if (order) {
+			return;
+		}
 		await this.datasource.transaction(async manager => {
 			const orderRepository = manager.getRepository(Order)
 			const outboxRepository = manager.getRepository(OutboxMessage)
