@@ -3,9 +3,8 @@ import { OutboxMessage } from '../db/entities/outbox.entity';
 import { OUTBOX_MESSAGE_TYPE } from '../db/types';
 import { DataSource } from 'typeorm';
 import { InventoryResponseMessage, QUEUE } from './types';
-import { OrdersSagaOrchestrator } from 'src/orders/orchestrator/orders.orchestrator';
-import { randomUUID } from 'node:crypto';
-import { InboxMessage } from 'src/db/entities/inbox.entity';
+import { OrdersSagaOrchestrator } from '../orders/orchestrator/orders.orchestrator';
+import { InboxMessage } from '../db/entities/inbox.entity';
 
 export class RabbitMQService {
 

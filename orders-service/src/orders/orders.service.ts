@@ -2,7 +2,7 @@ import { UUID } from "node:crypto";
 import { Order } from "../db/entities/order.entity";
 import { OutboxMessage } from "../db/entities/outbox.entity";
 import { Snapshot } from "../db/entities/snapshot.entity";
-import { OUTBOX_MESSAGE_TYPE } from "../db/types";
+import { OUTBOX_MESSAGE_TYPE, STATE } from "../db/types";
 import { DataSource } from "typeorm";
 import { Snapshot as SagaSnapshot} from "xstate";
 
@@ -12,12 +12,10 @@ export class OrdersService {
 	constructor(private datasource: DataSource) {}
 
 	createOrder = async (orderId: UUID, productId: number, quantity: number, snapshot: SagaSnapshot<unknown>) => {
-		console.log(`creating order with id ${orderId}`)
-		const orderRepository = this.datasource.getRepository(Order)
-		const order = await orderRepository.findOneBy({orderId})
-		if (order) {
-			console.log(`order with id ${orderId} already exists, skipping`)
-			return;
+		const snapshotRepository = this.datasource.getRepository(Snapshot)
+		const snap = await snapshotRepository.findOneBy({orderId})
+		if (snap.state === STATE.CREATE_ORDER) {
+			return
 		}
 		await this.datasource.transaction(async manager => {
 			const orderRepository = manager.getRepository(Order)
@@ -26,7 +24,7 @@ export class OrdersService {
 
 			const order = new Order(orderId, productId, quantity)
 			const outboxMessage = new OutboxMessage(orderId, productId, quantity, OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
-			const sagaSnapshot = new Snapshot(orderId, snapshot)
+			const sagaSnapshot = new Snapshot(orderId, STATE.CREATE_ORDER, snapshot)
 
 			await orderRepository.save(order)
 			await outboxRepository.save(outboxMessage)
