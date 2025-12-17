@@ -65,14 +65,24 @@ export class OrderSagaOrchestrator {
 
 	private handleOrderRequestActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
 		console.log('Handling Order Request')
-		const saga = this.sagas.get(input.orderId)
-		await this.ordersService.handleOrderRequest(input.orderId, input.productId, input.quantity, saga.getPersistedSnapshot())
+		await this.ordersService.handleOrderRequest(
+			input.orderId, 
+			input.productId, 
+			input.quantity, 
+			this.sagas.get(input.orderId).getPersistedSnapshot()
+		)
 	}
 
 	private handleInventoryReservationMessageActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number, message: any, messageId: any}}) =>  {
 		console.log('Handling Inventory Reservation Message')
-		const saga = this.sagas.get(input.orderId)
-		await this.inventoryService.handleInventoryResponse(input.orderId, input.productId, input.quantity, input.message, input.messageId, saga.getPersistedSnapshot())
+		await this.inventoryService.handleInventoryResponse(
+			input.orderId, 
+			input.productId, 
+			input.quantity, 
+			input.message, 
+			input.messageId, 
+			this.sagas.get(input.orderId).getPersistedSnapshot()
+		)
 	}
 
 }
