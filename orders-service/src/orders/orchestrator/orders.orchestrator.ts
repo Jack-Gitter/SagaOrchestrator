@@ -27,11 +27,14 @@ export class OrdersSagaOrchestrator {
 			types: {
 				input: {} as {orderId: UUID, productId: number, quantity: number},
 				context: {} as {orderId: UUID, productId: number, quantity: number},
-				events: {} as {type: ''}
+				events: {} as {type: 'handleInventoryResponseMessage'}
 			},
 			actors: {
 				createOrder: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => { 
 					await this.ordersService.createOrder(input.orderId, input.productId, input.quantity, this.actors.get(input.orderId).getPersistedSnapshot())
+				}),
+				handleInventoryResponseMessage: fromPromise(async () => {
+					console.log('handling inventory response message')
 				})
 			}
 		})
@@ -48,6 +51,14 @@ export class OrdersSagaOrchestrator {
 					invoke: {
 						src: 'createOrder',
 						input: ({context}) => ({orderId: context.orderId, productId: context.productId, quantity: context.quantity})
+					},
+					on: {
+						handleInventoryResponseMessage: 'handleInventoryResponseMessage'
+					}
+				},
+				handleInventoryResponseMessage: {
+					invoke: {
+						src: 'handleInventoryResponseMessage'
 					}
 				}
 			}
@@ -73,7 +84,10 @@ export class OrdersSagaOrchestrator {
 		}
 	}
 
-	handleSuccessfulInventoryResponseMessage() {}
+	handleInventoryResponseMessage(orderId: UUID) {
+		const actor = this.actors.get(orderId)
+		actor.send({type: 'handleInventoryResponseMessage' })
+	}
 
 	handleShippingResponseMessage() {}
 }

@@ -4,6 +4,7 @@ import { OUTBOX_MESSAGE_TYPE } from '../db/types';
 import { DataSource } from 'typeorm';
 import { QUEUE } from './types';
 import { OrdersSagaOrchestrator } from 'src/orders/orchestrator/orders.orchestrator';
+import { randomUUID } from 'node:crypto';
 
 export class RabbitMQService {
 
@@ -31,7 +32,7 @@ export class RabbitMQService {
 		this.channel.consume(QUEUE.REMOVE_INVENTORY_RESPONSE, (msg) => {
 			if (msg !== null) {
 				console.log('Received:', msg.content.toString());
-				this.orderSagaOrchestrator.handleSuccessfulInventoryResponseMessage()
+				this.orderSagaOrchestrator.handleInventoryResponseMessage(randomUUID())
 				// wait until the state machien work is done...
 				this.channel.ack(msg)
 			}
