@@ -23,14 +23,16 @@ const main = async () => {
 	await datasource.initialize()
 
 	const ordersService = new OrdersService(datasource)
+
 	const orchestrator = new OrdersSagaOrchestrator(ordersService, datasource)
+	await orchestrator.restoreFromDatabase()
+
 	const rabbitMQService = new RabbitMQService(datasource, orchestrator)
 	await rabbitMQService.init()
 	rabbitMQService.pollOutbox()
 
 	const server = new Server(Number(process.env.APP_PORT), orchestrator)
 
-	await orchestrator.restoreFromDatabase()
 	server.init()
 }
 
