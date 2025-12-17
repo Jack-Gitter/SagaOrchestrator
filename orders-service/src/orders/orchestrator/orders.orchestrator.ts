@@ -27,7 +27,7 @@ export class OrdersSagaOrchestrator {
 			types: {
 				input: {} as {orderId: UUID, productId: number, quantity: number},
 				context: {} as {orderId: UUID, productId: number, quantity: number},
-				events: {} as {type: 'handleInventoryResponseMessage'}
+				events: {} as {type: 'handleInventoryResponseMessage', successful: boolean}
 			},
 			actors: {
 				createOrder: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => { 
@@ -84,9 +84,9 @@ export class OrdersSagaOrchestrator {
 		}
 	}
 
-	handleInventoryResponseMessage(orderId: UUID) {
+	handleInventoryResponseMessage(orderId: UUID, successful: boolean) {
 		const actor = this.actors.get(orderId)
-		actor.send({type: 'handleInventoryResponseMessage' })
+		actor.send({type: 'handleInventoryResponseMessage', successful })
 	}
 
 	handleShippingResponseMessage() {}
