@@ -1,6 +1,4 @@
 import { DataSource } from "typeorm";
-import 'dotenv/config'
-import "reflect-metadata"
 import { randomUUID } from "node:crypto";
 import { OrderSagaOrchestrator } from "./orders/orchestrator/orchestrator";
 import { OrdersService } from "./orders/orders.service";
@@ -10,6 +8,8 @@ import { ReserveInventoryOutboxMessage } from "./db/entities/reserve-inventory-o
 import { Order } from "./db/entities/order.entity";
 import { InventoryService } from "./inventory/inventory.service";
 import { RabbitMQService } from "./rabbitmq/rabbitmq.service";
+import 'dotenv/config'
+import "reflect-metadata"
 
 const main = async () => {
 
