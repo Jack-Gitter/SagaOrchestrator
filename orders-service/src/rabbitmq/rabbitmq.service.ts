@@ -32,7 +32,7 @@ export class RabbitMQService {
 		this.channel.consume(QUEUE.REMOVE_INVENTORY_RESPONSE, (msg) => {
 			if (msg !== null) {
 				console.log('Received:', msg.content.toString());
-				this.orderSagaOrchestrator.handleInventoryResponseMessage(randomUUID())
+				this.orderSagaOrchestrator.handleInventoryResponseMessage(randomUUID(), true)
 				// wait until the state machien work is done...
 				this.channel.ack(msg)
 			}
