@@ -1,11 +1,12 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import { HTTP_METHOD } from './types'
+import { OrdersSagaOrchestrator } from 'src/orders/orders.orchestrator'
 
 export class Server {
 	private app: express.Express
 
-	constructor(private port: number) {
+	constructor(private port: number, private orderSagaOrchestrator: OrdersSagaOrchestrator) {
 		this.app = express()
 		this.app.use(bodyParser.json())
 		this.registerRoute('/', HTTP_METHOD.GET, this.homeRoute)
@@ -14,10 +15,14 @@ export class Server {
 	}
 
 	private registerRoute(path: string, method: HTTP_METHOD, func: (req: express.Request, res: express.Response) => any) {
-		if (method == 'get') {
-			this.app.get(path, func)
-		} else if (method == 'post') {
-			this.app.post(path, func)
+		switch(method) {
+			case HTTP_METHOD.GET: 
+				this.app.get(path, func)
+				break;
+			case HTTP_METHOD.POST: 
+				this.app.post(path, func)
+			default: 
+				throw new Error('not supported')
 		}
 	}
 
@@ -27,9 +32,8 @@ export class Server {
 
 	private placeOrder(req: express.Request, res: express.Response) {
 		const {productId, quantity}: {productId: number, quantity: number} = req.body
-		console.log(productId)
-		console.log(quantity)
-		res.send("ok!")
+		this.orderSagaOrchestrator.createPendingOrder(productId, quantity)
+		res.send('fuck yeah')
 	}
 
 	private listen() {
