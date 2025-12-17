@@ -3,12 +3,13 @@ import { Actor, AnyActorLogic, createActor, fromPromise, setup } from "xstate";
 import { OrdersService } from "../orders.service";
 import { DataSource } from "typeorm";
 import { Snapshot } from "../../db/entities/snapshot.entity";
+import { InventoryService } from "src/inventory/inventory.service";
 
 export class OrdersSagaOrchestrator {
 
 	private actors = new Map<UUID, Actor<AnyActorLogic>>();
 
-	constructor(private ordersService: OrdersService, private datasource: DataSource) {}
+	constructor(private ordersService: OrdersService, private inventoryService: InventoryService, private datasource: DataSource) {}
 
 	createOrder(productId: number, quantity: number) {
 		this.initializeNewSaga(productId, quantity)
@@ -33,8 +34,8 @@ export class OrdersSagaOrchestrator {
 				createOrder: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => { 
 					await this.ordersService.createOrder(input.orderId, input.productId, input.quantity, this.actors.get(input.orderId).getPersistedSnapshot())
 				}),
-				handleInventoryResponse: fromPromise(async () => {
-					console.log('handling inventory response message')
+				handleInventoryResponse: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => {
+					await this.inventoryService.handleInventoryMessage()
 				})
 			}
 		})
