@@ -3,7 +3,8 @@ import { Actor, AnyActorLogic, createActor, fromPromise, setup } from "xstate";
 import { OrdersService } from "../orders.service";
 import { DataSource } from "typeorm";
 import { Snapshot } from "../../db/entities/snapshot.entity";
-import { InventoryService } from "src/inventory/inventory.service";
+import { InventoryService } from "../../inventory/inventory.service";
+import { STATE } from "../../db/types";
 
 export class OrdersSagaOrchestrator {
 
@@ -47,8 +48,11 @@ export class OrdersSagaOrchestrator {
 						input.successful, 
 						this.actors.get(input.orderId).getPersistedSnapshot()
 					)
-				})
-			}
+				}),
+				persistState: fromPromise(async ({input}: {input: {orderId: UUID, state: STATE}}) => {
+					await this.persisState(input.orderId, input.state)
+				}),
+			},
 		})
 
 		const machine = machineSetup.createMachine({
@@ -76,6 +80,13 @@ export class OrdersSagaOrchestrator {
 					},
 				},
 				waitForInventoryResponse: {
+					invoke: {
+						src: 'persistState',
+						input: ({context}) => ({
+							orderId: context.orderId, 
+							state: STATE.WAIT_FOR_INVENTORY_RESPONSE
+						}),
+					},
 					on: {
 						receivedInventoryResponse: 'handleInventoryResponse'
 					}
@@ -127,6 +138,14 @@ export class OrdersSagaOrchestrator {
 				console.log(`Restored saga from snapshot for saga with orderId ${orderId}`)
 			})
 		}
+	}
+
+	private persisState = async (orderId: UUID, state: STATE) => {
+		const actor = this.actors.get(orderId)
+		const persistedSnapshot = actor.getPersistedSnapshot()
+		const snapshotRepository = this.datasource.getRepository(Snapshot)
+		const snapshot = new Snapshot(orderId, state, persistedSnapshot)
+		await snapshotRepository.save(snapshot)
 	}
 
 	public handleInventoryResponseMessage = async (orderId: UUID, successful: boolean) => {
