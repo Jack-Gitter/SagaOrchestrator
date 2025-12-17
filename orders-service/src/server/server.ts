@@ -5,7 +5,7 @@ export class Server {
 
 	constructor(private port: number) {
 		this.app = express()
-		this.registerRoute('/', this.HomeRoute)
+		this.registerRoute('/', this.homeRoute)
 		this.listen()
 	}
 
@@ -13,7 +13,7 @@ export class Server {
 		this.app.get(path, func)
 	}
 
-	private HomeRoute(req: express.Request, res: express.Response) {
+	private homeRoute(req: express.Request, res: express.Response) {
 		res.send('Hello World!')
 	}
 
