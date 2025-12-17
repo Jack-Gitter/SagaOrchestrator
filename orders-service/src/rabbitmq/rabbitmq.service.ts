@@ -24,22 +24,22 @@ export class RabbitMQService {
 	  }
 	}
 
-	sendMessage(queue: string, message: Buffer) {
+	sendMessage = (queue: string, message: Buffer) => {
 		this.channel.sendToQueue(queue, message)
 	}
 
-	listenForRemoveInventoryResponse() {
-		this.channel.consume(QUEUE.REMOVE_INVENTORY_RESPONSE, (msg) => {
+	listenForRemoveInventoryResponse = async () => {
+		await this.channel.consume(QUEUE.REMOVE_INVENTORY_RESPONSE, async (msg) => {
 			if (msg !== null) {
 				console.log('Received:', msg.content.toString());
-				this.orderSagaOrchestrator.handleInventoryResponseMessage(randomUUID(), true)
+				await this.orderSagaOrchestrator.handleInventoryResponseMessage(randomUUID(), true)
 				// wait until the state machien work is done...
 				this.channel.ack(msg)
 			}
 		})
 	}
 	
-	pollOutbox() {
+	pollOutbox = () => {
 		const outboxRepository = this.datasource.getRepository(OutboxMessage)
 		setInterval(async () => {
 			console.log('looking for messages')

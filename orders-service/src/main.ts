@@ -24,7 +24,7 @@ const main = async () => {
 
 	const ordersService = new OrdersService(datasource)
 	const orchestrator = new OrdersSagaOrchestrator(ordersService, datasource)
-	const rabbitMQService = new RabbitMQService(datasource)
+	const rabbitMQService = new RabbitMQService(datasource, orchestrator)
 	await rabbitMQService.init()
 	rabbitMQService.pollOutbox()
 

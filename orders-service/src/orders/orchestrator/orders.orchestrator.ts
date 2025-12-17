@@ -27,13 +27,13 @@ export class OrdersSagaOrchestrator {
 			types: {
 				input: {} as {orderId: UUID, productId: number, quantity: number},
 				context: {} as {orderId: UUID, productId: number, quantity: number},
-				events: {} as {type: 'handleInventoryResponseMessage', successful: boolean}
-			},
+				events: {} as {type: 'receivedInventoryResponse', successful: boolean} | {type: 'receivedShippingResponse', successful: boolean}
+	 		},
 			actors: {
 				createOrder: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => { 
 					await this.ordersService.createOrder(input.orderId, input.productId, input.quantity, this.actors.get(input.orderId).getPersistedSnapshot())
 				}),
-				handleInventoryResponseMessage: fromPromise(async () => {
+				handleInventoryResponse: fromPromise(async () => {
 					console.log('handling inventory response message')
 				})
 			}
@@ -50,15 +50,28 @@ export class OrdersSagaOrchestrator {
 				createOrder: {
 					invoke: {
 						src: 'createOrder',
-						input: ({context}) => ({orderId: context.orderId, productId: context.productId, quantity: context.quantity})
+						input: ({context}) => ({orderId: context.orderId, productId: context.productId, quantity: context.quantity}),
+						onDone: {
+							target: 'waitForInventoryResponse'
+						}
 					},
+				},
+				waitForInventoryResponse: {
 					on: {
-						handleInventoryResponseMessage: 'handleInventoryResponseMessage'
+						receivedInventoryResponse: 'handleInventoryResponse'
 					}
 				},
-				handleInventoryResponseMessage: {
+				handleInventoryResponse: {
 					invoke: {
-						src: 'handleInventoryResponseMessage'
+						src: 'handleInventoryResponse',
+						onDone: {
+							target: 'waitForShippingResponse'
+						}
+					}
+				},
+				waitForShippingResponse: {
+					on: {
+						receivedShippingResponse: 'handleshippingResponse'
 					}
 				}
 			}
@@ -84,9 +97,17 @@ export class OrdersSagaOrchestrator {
 		}
 	}
 
-	handleInventoryResponseMessage(orderId: UUID, successful: boolean) {
+	handleInventoryResponseMessage = async (orderId: UUID, successful: boolean) => {
 		const actor = this.actors.get(orderId)
-		actor.send({type: 'handleInventoryResponseMessage', successful })
+		actor.send({type: 'receivedInventoryResponse', successful })
+		await new Promise<void>((resolve) => {
+			const subscription = actor.subscribe((snapshot) => {
+				if (snapshot.matches('waitForShippingResponse')) {
+					subscription.unsubscribe();
+					resolve();
+				}
+			});
+		});
 	}
 
 	handleShippingResponseMessage() {}
