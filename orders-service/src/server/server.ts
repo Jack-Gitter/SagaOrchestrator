@@ -14,29 +14,30 @@ export class Server {
 		this.listen()
 	}
 
-	private registerRoute(path: string, method: HTTP_METHOD, func: (req: express.Request, res: express.Response) => any) {
+	private placeOrder = async (req: express.Request, res: express.Response) => {
+		const {productId, quantity}: {productId: number, quantity: number} = req.body
+		this.orderSagaOrchestrator.createPendingOrder(productId, quantity)
+		res.send()
+	}
+
+	private registerRoute = (path: string, method: HTTP_METHOD, func: (req: express.Request, res: express.Response) => any) => {
 		switch(method) {
 			case HTTP_METHOD.GET: 
 				this.app.get(path, func)
 				break;
 			case HTTP_METHOD.POST: 
 				this.app.post(path, func)
+				break;
 			default: 
 				throw new Error('not supported')
 		}
 	}
 
-	private homeRoute(req: express.Request, res: express.Response) {
+	private homeRoute = (req: express.Request, res: express.Response) => {
 		res.send('Hello World!')
 	}
 
-	private placeOrder(req: express.Request, res: express.Response) {
-		const {productId, quantity}: {productId: number, quantity: number} = req.body
-		this.orderSagaOrchestrator.createPendingOrder(productId, quantity)
-		res.send('fuck yeah')
-	}
-
-	private listen() {
+	private listen = () => {
 		this.app.listen(this.port, () => {
 		  console.log(`Example app listening on port ${this.port}`)
 		})
