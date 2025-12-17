@@ -1,18 +1,13 @@
-import { DataSource } from "typeorm";
-import { randomUUID } from "node:crypto";
-import { OrderSagaOrchestrator } from "./orders/orchestrator/orchestrator";
-import { OrdersService } from "./orders/orders.service";
-import { Inbox } from "./db/entities/inbox.entity";
-import { Snapshot } from "./db/entities/snapshot.entity";
-import { Outbox } from "./db/entities/outbox.entity";
-import { Order } from "./db/entities/order.entity";
-import { InventoryService } from "./inventory/inventory.service";
-import { RabbitMQService } from "./rabbitmq/rabbitmq.service";
 import 'dotenv/config'
 import "reflect-metadata"
+import { DataSource } from "typeorm";
+import { Snapshot } from "./db/entities/snapshot.entity";
+import { Order } from "./db/entities/order.entity";
+import { InboxMessage } from "./db/entities/inbox.entity";
+import { OutboxMessage } from "./db/entities/outbox.entity";
+import { Server } from './server/server';
 
 const main = async () => {
-
 	const datasource = new DataSource({
 		type: 'postgres',
 		host: "localhost",
@@ -20,18 +15,10 @@ const main = async () => {
 		username: process.env.PG_USERNAME,
 		password: process.env.PG_PASSWORD,
 		database: process.env.PG_DATABASE,
-		entities: [Inbox, Order, Snapshot, Outbox]
+		entities: [InboxMessage, OutboxMessage, Order, Snapshot]
 	})
 	await datasource.initialize()
-
-	const ordersService = new OrdersService(datasource);
-	const inventoryService = new InventoryService(datasource)
-
-	const orchestrator = new OrderSagaOrchestrator(ordersService, inventoryService);
-	const rabbitMQService = new RabbitMQService(orchestrator, datasource)
-
-	orchestrator.initializeOrderAction(randomUUID(), 2, 3)
-
+	const s = new Server(Number(process.env.APP_PORT))
 }
 
 main()
