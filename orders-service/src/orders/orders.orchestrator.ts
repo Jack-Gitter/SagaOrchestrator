@@ -7,7 +7,7 @@ export class OrdersSagaOrchestrator {
 
 	constructor() {}
 
-	createPendingOrder(productId: number, quantity: number) {
+	createOrder(productId: number, quantity: number) {
 		this.initializeNewSaga(productId, quantity)
 	}
 
