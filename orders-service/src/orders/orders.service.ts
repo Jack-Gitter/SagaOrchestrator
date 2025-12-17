@@ -13,11 +13,6 @@ export class OrdersService {
 	constructor(private datasource: DataSource) {}
 
 	async handleOrderRequest(orderId: UUID, productId: number, quantity: number, snapshot: StateMachineSnapshot<unknown>) {
-		const inboxRepository = this.datasource.getRepository(InboxMessage)
-		if (await inboxRepository.findOneBy({orderId})) {
-			return;
-		}
-
 		await this.datasource.transaction(async (transaction) => {
 			const snapshotRepository = this.datasource.getRepository(Snapshot)
 			const inboxRepository = transaction.getRepository(InboxMessage)
