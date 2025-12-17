@@ -53,6 +53,9 @@ export class OrdersSagaOrchestrator {
 						input: ({context}) => ({orderId: context.orderId, productId: context.productId, quantity: context.quantity}),
 						onDone: {
 							target: 'waitForInventoryResponse'
+						},
+						onError: {
+							target: 'error'
 						}
 					},
 				},
@@ -66,6 +69,9 @@ export class OrdersSagaOrchestrator {
 						src: 'handleInventoryResponse',
 						onDone: {
 							target: 'waitForShippingResponse'
+						},
+						onError: {
+							target: 'error'
 						}
 					}
 				},
@@ -74,8 +80,11 @@ export class OrdersSagaOrchestrator {
 						receivedShippingResponse: 'handleShippingResponse'
 					}
 				},
-				handleShippingResponse: {}
-			}
+				handleShippingResponse: {},
+				error: {type: 'final'},
+				complete: {type: 'final'},
+
+			},
 		})
 		return machine;
 	}

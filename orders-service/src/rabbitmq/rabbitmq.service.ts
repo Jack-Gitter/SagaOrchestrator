@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { InventoryResponseMessage, QUEUE } from './types';
 import { OrdersSagaOrchestrator } from 'src/orders/orchestrator/orders.orchestrator';
 import { randomUUID } from 'node:crypto';
+import { InboxMessage } from 'src/db/entities/inbox.entity';
 
 export class RabbitMQService {
 
@@ -35,6 +36,13 @@ export class RabbitMQService {
 			if (msg !== null) {
 				const message: InventoryResponseMessage = JSON.parse(msg.content.toString())
 				console.log(`Received message with orderId ${message.orderId} and status ${message.successful}`);
+				const inboxRepository = this.datasource.getRepository(InboxMessage)
+				const inboxMessage = await inboxRepository.findOneBy({id: message.id})
+				if (inboxMessage) {
+					console.log(`Acking already processed message with orderId ${message.orderId} and status ${message.successful}`)
+					this.channel.ack(msg)
+					return;
+				}
 				await this.orderSagaOrchestrator.handleInventoryResponseMessage(message.orderId, message.successful)
 				this.channel.ack(msg)
 			}

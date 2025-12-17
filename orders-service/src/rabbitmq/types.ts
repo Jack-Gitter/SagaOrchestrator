@@ -8,6 +8,7 @@ export enum QUEUE {
 }
 
 export interface InventoryResponseMessage {
+	id: UUID,
 	orderId: UUID,
 	successful: boolean
 }
