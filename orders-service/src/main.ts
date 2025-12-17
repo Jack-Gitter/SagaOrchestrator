@@ -8,6 +8,7 @@ import { OutboxMessage } from "./db/entities/outbox.entity";
 import { Server } from './server/server';
 import { OrdersService } from './orders/orders.service';
 import { OrdersSagaOrchestrator } from './orders/orchestrator/orders.orchestrator';
+import { RabbitMQService } from './rabbitmq/rabbitmq.service';
 
 const main = async () => {
 	const datasource = new DataSource({
@@ -23,6 +24,9 @@ const main = async () => {
 
 	const ordersService = new OrdersService(datasource)
 	const orchestrator = new OrdersSagaOrchestrator(ordersService, datasource)
+	const rabbitMQService = new RabbitMQService(datasource)
+	await rabbitMQService.init()
+
 	const server = new Server(Number(process.env.APP_PORT), orchestrator)
 
 	await orchestrator.restoreFromDatabase()

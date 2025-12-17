@@ -1,12 +1,47 @@
 import * as amqplib from 'amqplib'
+import { OutboxMessage } from 'src/db/entities/outbox.entity';
+import { OUTBOX_MESSAGE_TYPE } from 'src/db/types';
+import { DataSource } from 'typeorm';
+import { QUEUE } from './types';
 
 export class RabbitMQService {
 
-	constructor(private queue: string) {}
+	private channel: amqplib.Channel
+	constructor(private datasource: DataSource) {}
 
 	async init() {
-	  const connection = await amqplib.connect('amqp://localhost');
+	  const connection = await amqplib.connect({
+		  username: process.env.RABBITMQ_USER,
+		  password: process.env.RABBITMQ_PASSWORD
+	  });
 	  const channel = await connection.createChannel();
-	  await channel.assertQueue(this.queue);
+	  this.channel = channel;
+
+	  for (const queue of Object.values(QUEUE)) {
+		await channel.assertQueue(queue)
+	  }
 	}
+
+	sendMessage(queue: string, message: Buffer) {
+		this.channel.sendToQueue(queue, message)
+	}
+
+	pollOutbox() {
+		const outboxRepository = this.datasource.getRepository(OutboxMessage)
+		setInterval(async () => {
+			const outboxMessages = await outboxRepository.find()
+			for (const outboxMessage of outboxMessages) {
+				switch (outboxMessage.messageType) {
+					case OUTBOX_MESSAGE_TYPE.RESERVE_INVENTORY: 
+						const json = outboxMessage.toJson();
+						const buffer = Buffer.from(JSON.stringify(json))
+						this.channel.sendToQueue(QUEUE.RESERVE_INVENTORY, buffer)
+						break;
+					default: 
+						throw new Error('not supported yet')
+				}
+			}
+		}, 5000)
+	}
+
 }

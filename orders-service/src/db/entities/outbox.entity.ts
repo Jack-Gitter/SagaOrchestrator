@@ -11,10 +11,10 @@ export class OutboxMessage {
 	orderId: UUID
 
 	@Column('int')
-	quantity: number
+	productId: number
 
 	@Column('int')
-	productId: number
+	quantity: number
 
 	@Column({type: 'enum', enum: OUTBOX_MESSAGE_TYPE})
 	messageType: OUTBOX_MESSAGE_TYPE
@@ -31,4 +31,11 @@ export class OutboxMessage {
 		this.productId = productId
 		this.messageType = messageType
 	}
+
+	public toJson = () => ({
+		id: this.id,
+		orderId: this.orderId,
+		productId: this.productId,
+		quantity: this.quantity,
+	})
 }
