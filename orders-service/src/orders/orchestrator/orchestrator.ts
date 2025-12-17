@@ -8,13 +8,13 @@ export class OrderSagaOrchestrator {
 	
 	private sagas = new Map<UUID, Actor<AnyActorLogic>>();
 
-	constructor(private ordersService: OrdersService, private inventoryService: InventoryService) {}
+	constructor(private ordersService: OrdersService, private inventoryService: InventoryService,) {}
 
 	initializeOrderAction(orderId: UUID, productId: number, quantity: number) {
 
 		const orderMachineSetup = setup({
 		  types: {
-			events: {} as {type: 'handleOrderComplete'},
+			events: {} as {type: 'inventoryReservationMessageReceived', message: any; messageId: string},
 			context: {} as { orderId: UUID, productId: number, quantity: number},
 		  },
 		  actors: {
@@ -34,13 +34,21 @@ export class OrderSagaOrchestrator {
 						input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity }),
 					},
 					on: {
-						handleOrderComplete: 'handleInventoryReservationMessage'
+						inventoryReservationMessageReceived: 'handleInventoryReservationMessage'
 					}
 				},
 				handleInventoryReservationMessage: {
 					invoke: {
 						src: 'handleInventoryReservationMessageActor',
-						input: ({ context: { orderId, productId, quantity } }) => ({ orderId, productId, quantity }),
+						input: ({context, event}) => (
+							{ 
+								orderId: context.orderId, 
+								productId: context.productId, 
+								quantity: context.productId,
+								message: event.message,
+								messageId: event.messageId,
+							}
+						),
 					},
 				}
 			},
@@ -52,10 +60,8 @@ export class OrderSagaOrchestrator {
 
 	}
 
-	public inventoryResponseListener() {
-		const orderId = randomUUID()
-		const actor = this.sagas.get(orderId)
-		actor.send({type: ''})
+	public getActor(orderId: UUID) {
+		return this.sagas.get(orderId)
 	}
 
 	private handleOrderRequestActor = async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) =>  {
