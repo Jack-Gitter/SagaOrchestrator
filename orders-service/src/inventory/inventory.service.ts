@@ -1,7 +1,7 @@
 import { UUID } from "crypto";
-import { InboxMessage } from "../db/entities/inbox.entity";
+import { Inbox } from "../db/entities/inbox.entity";
 import { Snapshot } from "../db/entities/snapshot.entity";
-import { MESSAGE_TYPE } from "../db/types";
+import { INBOX_MESSAGE_TYPE } from "../db/types";
 import { DataSource } from "typeorm";
 import { Snapshot as SagaSnapshot } from "xstate";
 
@@ -12,9 +12,9 @@ export class InventoryService {
 	async handleInventoryResponse(orderId: UUID, productId: number, quantity: number, message: any, messageId: any, snapshot: SagaSnapshot<unknown>) {
 		await this.datasource.transaction(async (transaction) => {
 			const snapshotRepository = this.datasource.getRepository(Snapshot)
-			const inboxRepository = transaction.getRepository(InboxMessage)
+			const inboxRepository = transaction.getRepository(Inbox)
 
-			const inboxMessage = new InboxMessage(orderId, MESSAGE_TYPE.INVENTORY_REMOVE_RESPONSE, true);
+			const inboxMessage = new Inbox(orderId, INBOX_MESSAGE_TYPE.INVENTORY_REMOVE_RESPONSE, true);
 			const snapshotEntity = new Snapshot(orderId, snapshot)
 
 			await inboxRepository.save(inboxMessage)

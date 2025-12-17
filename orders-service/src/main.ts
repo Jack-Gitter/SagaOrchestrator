@@ -2,9 +2,9 @@ import { DataSource } from "typeorm";
 import { randomUUID } from "node:crypto";
 import { OrderSagaOrchestrator } from "./orders/orchestrator/orchestrator";
 import { OrdersService } from "./orders/orders.service";
-import { InboxMessage } from "./db/entities/inbox.entity";
+import { Inbox } from "./db/entities/inbox.entity";
 import { Snapshot } from "./db/entities/snapshot.entity";
-import { ReserveInventoryOutboxMessage } from "./db/entities/reserve-inventory-outbox-message.entity";
+import { Outbox } from "./db/entities/reserve-inventory-outbox-message.entity";
 import { Order } from "./db/entities/order.entity";
 import { InventoryService } from "./inventory/inventory.service";
 import { RabbitMQService } from "./rabbitmq/rabbitmq.service";
@@ -20,7 +20,7 @@ const main = async () => {
 		username: process.env.PG_USERNAME,
 		password: process.env.PG_PASSWORD,
 		database: process.env.PG_DATABASE,
-		entities: [InboxMessage, Order, Snapshot, ReserveInventoryOutboxMessage]
+		entities: [Inbox, Order, Snapshot, Outbox]
 	})
 	await datasource.initialize()
 

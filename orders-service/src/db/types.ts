@@ -4,7 +4,11 @@ export enum ORDER_STATUS {
 	FULFILLED = 'fulfilled'
 }
 
-export enum MESSAGE_TYPE {
+export enum INBOX_MESSAGE_TYPE {
 	RECEIVE_ORDER = 'createPendingOrder',
 	INVENTORY_REMOVE_RESPONSE = 'inventoryRemoveResponse'
+}
+
+export enum OUTBOX_MESSAGE_TYPE {
+	RESERVE_INVENTORY = 'reserveInventory'
 }

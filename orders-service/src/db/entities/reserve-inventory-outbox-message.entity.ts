@@ -1,8 +1,9 @@
 import { UUID } from "node:crypto";
 import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { OUTBOX_MESSAGE_TYPE } from "../types";
 
-@Entity('reserve_inventory_outbox_messages')
-export class ReserveInventoryOutboxMessage {
+@Entity('outbox')
+export class Outbox {
 	@Column({type: 'uuid', primary: true})
 	orderId: UUID
 
@@ -11,6 +12,9 @@ export class ReserveInventoryOutboxMessage {
 
 	@Column('int')
 	productId: number
+
+	@Column({type: 'enum', enum: OUTBOX_MESSAGE_TYPE})
+	messageType: OUTBOX_MESSAGE_TYPE
 
 	@CreateDateColumn()
 	createdAt: Date;

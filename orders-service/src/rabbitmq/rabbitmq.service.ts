@@ -1,6 +1,6 @@
 import * as amqplib from 'amqplib'
 import { randomUUID } from 'node:crypto';
-import { InboxMessage } from '../db/entities/inbox.entity';
+import { Inbox } from '../db/entities/inbox.entity';
 import { OrderSagaOrchestrator } from '../orders/orchestrator/orchestrator';
 import { DataSource } from 'typeorm';
 import { waitFor } from 'xstate';
@@ -20,7 +20,7 @@ export class RabbitMQService {
 
 		const orderId = randomUUID()
 
-		const inboxRepository = this.datasource.getRepository(InboxMessage)
+		const inboxRepository = this.datasource.getRepository(Inbox)
 		if (await inboxRepository.findOneBy({orderId})) {
 			// just ack the message and return, we've already seen it and processed it
 		}
