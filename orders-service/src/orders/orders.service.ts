@@ -12,9 +12,11 @@ export class OrdersService {
 	constructor(private datasource: DataSource) {}
 
 	createOrder = async (orderId: UUID, productId: number, quantity: number, snapshot: SagaSnapshot<unknown>) => {
+		console.log(`creating order with id ${orderId}`)
 		const orderRepository = this.datasource.getRepository(Order)
 		const order = await orderRepository.findOneBy({orderId})
 		if (order) {
+			console.log(`order with id ${orderId} already exists, skipping`)
 			return;
 		}
 		await this.datasource.transaction(async manager => {
