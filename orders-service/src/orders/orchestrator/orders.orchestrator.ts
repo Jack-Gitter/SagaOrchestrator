@@ -32,10 +32,21 @@ export class OrdersSagaOrchestrator {
 	 		},
 			actors: {
 				createOrder: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => { 
-					await this.ordersService.createOrder(input.orderId, input.productId, input.quantity, this.actors.get(input.orderId).getPersistedSnapshot())
+					await this.ordersService.createOrder(
+						input.orderId, 
+						input.productId, 
+						input.quantity, 
+						this.actors.get(input.orderId).getPersistedSnapshot()
+					)
 				}),
-				handleInventoryResponse: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => {
-					await this.inventoryService.handleInventoryMessage()
+				handleInventoryResponse: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, successful: boolean, quantity: number}}) => {
+					await this.inventoryService.handleInventoryMessage(
+						input.orderId, 
+						input.productId, 
+						input.quantity, 
+						input.successful, 
+						this.actors.get(input.orderId).getPersistedSnapshot()
+					)
 				})
 			}
 		})
@@ -51,7 +62,11 @@ export class OrdersSagaOrchestrator {
 				createOrder: {
 					invoke: {
 						src: 'createOrder',
-						input: ({context}) => ({orderId: context.orderId, productId: context.productId, quantity: context.quantity}),
+						input: ({context}) => ({
+							orderId: context.orderId, 
+							productId: context.productId, 
+							quantity: context.quantity
+						}),
 						onDone: {
 							target: 'waitForInventoryResponse'
 						},
@@ -68,6 +83,12 @@ export class OrdersSagaOrchestrator {
 				handleInventoryResponse: {
 					invoke: {
 						src: 'handleInventoryResponse',
+						input: ({context, event}) => ({
+							orderId: context.orderId, 
+							productId: context.productId, 
+							quantity: context.quantity,
+							successful: event.successful  
+						}),
 						onDone: {
 							target: 'waitForShippingResponse'
 						},
