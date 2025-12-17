@@ -13,7 +13,7 @@ export class OrderSagaOrchestrator {
 
 		const orderMachineSetup = setup({
 		  types: {
-			events: {} as { type: 'inventoryReservationMessageReceived', message: any; messageId: string },
+			events: {} as { type: 'successfulInventoryReservationMessageReceived', message: any; messageId: string },
 			context: {} as { orderId: UUID, productId: number, quantity: number},
 		  },
 		  actors: {
@@ -33,7 +33,7 @@ export class OrderSagaOrchestrator {
 						input: ({ context }) => ({ orderId: context.orderId, productId: context.productId, quantity: context.quantity }),
 					},
 					on: {
-						inventoryReservationMessageReceived: 'handleInventoryReservationMessage'
+						successfulInventoryReservationMessageReceived: 'handleInventoryReservationMessage'
 					}
 				},
 				handleInventoryReservationMessage: {

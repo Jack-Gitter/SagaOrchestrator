@@ -26,7 +26,7 @@ export class RabbitMQService {
 		}
 
 		const actor = this.ordersSagaOrchestrator.getActor(orderId)
-		actor.send({type: 'inventoryReservationMessageReceived', message: {}, messageId: '123'})
+		actor.send({type: 'successfulInventoryReservationMessageReceived', message: {}, messageId: '123'})
 
 		await waitFor(
 			actor, 
