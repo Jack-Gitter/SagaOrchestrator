@@ -11,12 +11,6 @@ export class InventoryService {
 
 
 	async handleInventoryResponse(orderId: UUID, productId: number, quantity: number, message: any, messageId: any, snapshot: SagaSnapshot<unknown>) {
-
-		const inboxRepository = this.datasource.getRepository(InboxMessage)
-		if (await inboxRepository.findOneBy({orderId})) {
-			return;
-		}
-
 		await this.datasource.transaction(async (transaction) => {
 			const snapshotRepository = this.datasource.getRepository(Snapshot)
 			const inboxRepository = transaction.getRepository(InboxMessage)
@@ -27,9 +21,5 @@ export class InventoryService {
 			await inboxRepository.save(inboxMessage)
 			await snapshotRepository.save(snapshotEntity)
 		})
-
-		// we have to ack the message after we transition state somehow
-
 	}
-
 }
