@@ -10,7 +10,6 @@ export class InventoryService {
 
 	constructor(private datasource: DataSource) {}
 
-	// if we are in this state before we do the work, skip
 	handleInventoryMessage = async (orderId: UUID, productId: number, quantity: number, successful: boolean, sagaSnapshot: SagaSnapshot<unknown>) => {
 		const snapshotRepository = this.datasource.getRepository(Snapshot)
 		const snap = await snapshotRepository.findOneBy({orderId})
