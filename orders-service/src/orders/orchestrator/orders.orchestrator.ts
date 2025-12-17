@@ -131,6 +131,8 @@ export class OrdersSagaOrchestrator {
 
 	public handleInventoryResponseMessage = async (orderId: UUID, successful: boolean) => {
 		const actor = this.actors.get(orderId)
+		// there is a bug here, the promise will never resolve in the event that
+		// our state machien is not ready to receive "receivedInventoryResponse" message
 		actor.send({type: 'receivedInventoryResponse', successful })
 		await new Promise<void>((resolve) => {
 			const subscription = actor.subscribe((snapshot) => {

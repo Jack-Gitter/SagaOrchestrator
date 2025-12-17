@@ -15,7 +15,7 @@ export class OrdersService {
 		console.log('handling create order')
 		const snapshotRepository = this.datasource.getRepository(Snapshot)
 		const snap = await snapshotRepository.findOneBy({orderId})
-		if (snap.state === STATE.CREATE_ORDER) {
+		if (snap?.state === STATE.CREATE_ORDER) {
 			console.log('already handled, skipping')
 			return
 		}
