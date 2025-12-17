@@ -33,7 +33,6 @@ export class RabbitMQService {
 			if (msg !== null) {
 				console.log('Received:', msg.content.toString());
 				await this.orderSagaOrchestrator.handleInventoryResponseMessage(randomUUID(), true)
-				// wait until the state machien work is done...
 				this.channel.ack(msg)
 			}
 		})
