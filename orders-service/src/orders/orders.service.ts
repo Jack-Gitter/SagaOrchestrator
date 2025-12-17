@@ -1,13 +1,29 @@
+import { UUID } from "node:crypto";
+import { Order } from "../db/entities/order.entity";
+import { OutboxMessage } from "../db/entities/outbox.entity";
+import { Snapshot } from "../db/entities/snapshot.entity";
+import { OUTBOX_MESSAGE_TYPE } from "../db/types";
 import { DataSource } from "typeorm";
+import { Snapshot as SagaSnapshot} from "xstate";
 
 export class OrdersService {
 
 
 	constructor(private datasource: DataSource) {}
 
-	// persist inbox, outbox, pending order, and state machine state all at once
-	createOrder = async () => {
+	createOrder = async (orderId: UUID, productId: number, quantity: number, snapshot: SagaSnapshot<unknown>) => {
+		await this.datasource.transaction(async manager => {
+			const orderRepository = manager.getRepository(Order)
+			const outboxRepository = manager.getRepository(OutboxMessage)
+			const snapshotRepository = manager.getRepository(Snapshot)
+
+			const order = new Order(orderId, productId, quantity)
+			const outboxMessage = new OutboxMessage(orderId, productId, quantity, OUTBOX_MESSAGE_TYPE.RESERVE_INVENTORY)
+			const sagaSnapshot = new Snapshot(orderId, snapshot)
+
+			await orderRepository.save(order)
+			await outboxRepository.save(outboxMessage)
+			await snapshotRepository.save(sagaSnapshot)
+		})
 	}
-
-
 }

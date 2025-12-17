@@ -6,7 +6,8 @@ import { Order } from "./db/entities/order.entity";
 import { InboxMessage } from "./db/entities/inbox.entity";
 import { OutboxMessage } from "./db/entities/outbox.entity";
 import { Server } from './server/server';
-import { OrdersSagaOrchestrator } from './orders/orders.orchestrator';
+import { OrdersService } from './orders/orders.service';
+import { OrdersSagaOrchestrator } from './orders/orchestrator/orders.orchestrator';
 
 const main = async () => {
 	const datasource = new DataSource({
@@ -19,8 +20,13 @@ const main = async () => {
 		entities: [InboxMessage, OutboxMessage, Order, Snapshot]
 	})
 	await datasource.initialize()
-	const orchestrator = new OrdersSagaOrchestrator()
-	const s = new Server(Number(process.env.APP_PORT), orchestrator)
+
+	const ordersService = new OrdersService(datasource)
+	const orchestrator = new OrdersSagaOrchestrator(ordersService, datasource)
+	const server = new Server(Number(process.env.APP_PORT), orchestrator)
+
+	await orchestrator.restoreFromDatabase()
+	server.init()
 }
 
 main()

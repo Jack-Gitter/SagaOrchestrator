@@ -26,7 +26,7 @@ export class Order {
 	@UpdateDateColumn()
 	updatedAt: Date;
 	
-	constructor(orderId: UUID, quantity: number, productId: number) {
+	constructor(orderId: UUID,  productId: number, quantity: number,) {
 		this.quantity = quantity;
 		this.productId = productId;
 		this.status = ORDER_STATUS.PENDING;

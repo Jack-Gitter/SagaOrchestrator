@@ -1,12 +1,14 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import { HTTP_METHOD } from './types'
-import { OrdersSagaOrchestrator } from 'src/orders/orders.orchestrator'
+import { OrdersSagaOrchestrator } from 'src/orders/orchestrator/orders.orchestrator'
 
 export class Server {
 	private app: express.Express
 
-	constructor(private port: number, private orderSagaOrchestrator: OrdersSagaOrchestrator) {
+	constructor(private port: number, private orderSagaOrchestrator: OrdersSagaOrchestrator) {}
+
+	init() {
 		this.app = express()
 		this.app.use(bodyParser.json())
 		this.registerRoute('/', HTTP_METHOD.GET, this.homeRoute)

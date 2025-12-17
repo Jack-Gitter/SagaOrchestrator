@@ -25,7 +25,7 @@ export class OutboxMessage {
 	@UpdateDateColumn()
 	updatedAt: Date;
 
-	constructor(orderId: UUID, quantity: number, productId: number, messageType: OUTBOX_MESSAGE_TYPE) {
+	constructor(orderId: UUID, productId: number, quantity: number, messageType: OUTBOX_MESSAGE_TYPE) {
 		this.orderId = orderId
 		this.quantity = quantity
 		this.productId = productId
