@@ -71,9 +71,10 @@ export class OrdersSagaOrchestrator {
 				},
 				waitForShippingResponse: {
 					on: {
-						receivedShippingResponse: 'handleshippingResponse'
+						receivedShippingResponse: 'handleShippingResponse'
 					}
-				}
+				},
+				handleShippingResponse: {}
 			}
 		})
 		return machine;
