@@ -1,7 +1,6 @@
-import { randomUUID, UUID } from "node:crypto";
+import { UUID } from "node:crypto";
 import { InventoryService } from "src/inventory/inventory.service";
 import { OrdersService } from "src/orders/orders.service";
-import { DataSource } from "typeorm";
 import {setup, Actor, createActor, fromPromise, AnyActorLogic } from "xstate";
 
 export class OrderSagaOrchestrator {
