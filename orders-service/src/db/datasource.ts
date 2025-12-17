@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
 import 'dotenv/config'
 import { Inbox } from "./entities/inbox.entity";
-import { Outbox } from "./entities/reserve-inventory-outbox-message.entity";
+import { Outbox } from "./entities/outbox.entity";
 import { Snapshot } from "./entities/snapshot.entity";
 import { Order } from "./entities/order.entity";
 import { Init1765932185971 } from "./migrations/1765932185971-init";

@@ -1,5 +1,5 @@
 import { UUID } from "node:crypto";
-import { Outbox } from "../db/entities/reserve-inventory-outbox-message.entity";
+import { Outbox } from "../db/entities/outbox.entity";
 import { DataSource } from "typeorm";
 import { Order } from "../db/entities/order.entity";
 import { Snapshot as StateMachineSnapshot} from "xstate";

@@ -4,7 +4,7 @@ import { OrderSagaOrchestrator } from "./orders/orchestrator/orchestrator";
 import { OrdersService } from "./orders/orders.service";
 import { Inbox } from "./db/entities/inbox.entity";
 import { Snapshot } from "./db/entities/snapshot.entity";
-import { Outbox } from "./db/entities/reserve-inventory-outbox-message.entity";
+import { Outbox } from "./db/entities/outbox.entity";
 import { Order } from "./db/entities/order.entity";
 import { InventoryService } from "./inventory/inventory.service";
 import { RabbitMQService } from "./rabbitmq/rabbitmq.service";
