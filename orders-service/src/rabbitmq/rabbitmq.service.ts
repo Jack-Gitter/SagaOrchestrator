@@ -2,7 +2,7 @@ import * as amqplib from 'amqplib'
 import { OutboxMessage } from '../db/entities/outbox.entity';
 import { OUTBOX_MESSAGE_TYPE } from '../db/types';
 import { DataSource } from 'typeorm';
-import { QUEUE } from './types';
+import { InventoryResponseMessage, QUEUE } from './types';
 import { OrdersSagaOrchestrator } from 'src/orders/orchestrator/orders.orchestrator';
 import { randomUUID } from 'node:crypto';
 
@@ -22,6 +22,8 @@ export class RabbitMQService {
 	  for (const queue of Object.values(QUEUE)) {
 		await channel.assertQueue(queue)
 	  }
+
+	  await this.listenForRemoveInventoryResponse()
 	}
 
 	sendMessage = (queue: string, message: Buffer) => {
@@ -31,8 +33,9 @@ export class RabbitMQService {
 	listenForRemoveInventoryResponse = async () => {
 		await this.channel.consume(QUEUE.REMOVE_INVENTORY_RESPONSE, async (msg) => {
 			if (msg !== null) {
-				console.log('Received:', msg.content.toString());
-				await this.orderSagaOrchestrator.handleInventoryResponseMessage(randomUUID(), true)
+				const message: InventoryResponseMessage = JSON.parse(msg.content.toString())
+				console.log(`Received message with orderId ${message.orderId} and status ${message.successful}`);
+				await this.orderSagaOrchestrator.handleInventoryResponseMessage(message.orderId, message.successful)
 				this.channel.ack(msg)
 			}
 		})
