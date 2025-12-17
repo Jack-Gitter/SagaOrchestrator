@@ -90,7 +90,7 @@ export class OrdersSagaOrchestrator {
 		return machine;
 	}
 
-	public async restoreFromDatabase() {
+	public restoreFromDatabase = async () => {
 		const snapshotRepository = this.datasource.getRepository(Snapshot)
 		const snapshotEntities = await snapshotRepository.find()
 		if (snapshotEntities.length > 0) {
@@ -108,7 +108,7 @@ export class OrdersSagaOrchestrator {
 		}
 	}
 
-	handleInventoryResponseMessage = async (orderId: UUID, successful: boolean) => {
+	public handleInventoryResponseMessage = async (orderId: UUID, successful: boolean) => {
 		const actor = this.actors.get(orderId)
 		actor.send({type: 'receivedInventoryResponse', successful })
 		await new Promise<void>((resolve) => {
