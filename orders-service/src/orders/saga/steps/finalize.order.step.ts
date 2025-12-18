@@ -1,11 +1,11 @@
 import { DataSource } from "typeorm";
 import { SagaStepInterface } from "./saga.step.interface";
 import { STEP } from "../../../db/entities/types";
-import { InboxMessage } from "src/db/entities/inbox.entity";
-import { OrderSagaEntity } from "src/db/entities/saga.entity";
-import { INBOX_MESSAGE_TYPE, ORDER_STATUS } from "src/db/types";
+import { InboxMessage } from "../../../db/entities/inbox.entity";
+import { OrderSagaEntity } from "../../../db/entities/saga.entity";
+import { INBOX_MESSAGE_TYPE, ORDER_STATUS } from "../../../db/types";
 import { OrderSagaStepData } from "./types";
-import { Order } from "src/db/entities/order.entity";
+import { Order } from "../../../db/entities/order.entity";
 
 export class FinalizeOrderStep implements SagaStepInterface<OrderSagaStepData, OrderSagaStepData> {
 

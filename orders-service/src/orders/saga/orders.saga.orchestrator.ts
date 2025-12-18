@@ -19,6 +19,10 @@ export class OrderSagaOrchestrator {
 
 	async invokeNext(orderId: UUID, messageId?: UUID) {
 		const saga = this.sagas.get(orderId)
+		if (!saga) {
+			console.log(`No saga with orderId ${orderId} found`)
+			return
+		}
 		await saga.invokeNext(messageId)
 	}
 

@@ -23,15 +23,16 @@ export class RabbitMQService {
 	  for (const queue of Object.values(OUTBOX_MESSAGE_TYPE)) {
 		await channel.assertQueue(queue)
 	  }
+
 	  for (const queue of Object.values(INBOX_MESSAGE_TYPE)) {
 		await channel.assertQueue(queue)
+		this.listenForMessage(queue)
 	  }
 		this.pollOutbox()
-		this.listenForMessage()
 	}
 
-	listenForMessage = async () => {
-		await this.channel.consume(INBOX_MESSAGE_TYPE.INVENTORY_RESPONSE, async (msg) => {
+	listenForMessage = async (queue: INBOX_MESSAGE_TYPE | OUTBOX_MESSAGE_TYPE) => {
+		await this.channel.consume(queue, async (msg) => {
 			if (msg !== null) {
 				const message: ResponseMessage = JSON.parse(msg.content.toString())
 				console.log(`Received message with orderId ${message.orderId} and status ${message.success}`);
