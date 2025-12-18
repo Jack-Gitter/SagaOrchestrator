@@ -2,7 +2,7 @@ import { UUID } from "node:crypto";
 import { Order } from "../db/entities/order.entity";
 import { OutboxMessage } from "../db/entities/outbox.entity";
 import { Snapshot } from "../db/entities/snapshot.entity";
-import { OUTBOX_MESSAGE_TYPE, STATE } from "../db/types";
+import { ORDER_STATUS, OUTBOX_MESSAGE_TYPE, STATE } from "../db/types";
 import { DataSource } from "typeorm";
 import { Snapshot as SagaSnapshot} from "xstate";
 
@@ -33,8 +33,13 @@ export class OrdersService {
 		})
 	}
 
-	finalizeOrder = async () => {
-		console.log('finalizing order')
+	finalizeOrder = async (orderId: UUID) => {
+		await this.datasource.transaction(async manager => {
+			const orderRepository = manager.getRepository(Order)
+			const existingOrder = await orderRepository.findOneBy({orderId})
+			existingOrder.status = ORDER_STATUS.FULFILLED
+			await orderRepository.save(existingOrder)
+		})
 	}
 
 }
