@@ -5,7 +5,7 @@ import { Snapshot } from "../db/entities/snapshot.entity";
 import { INBOX_MESSAGE_TYPE, ORDER_STATUS, OUTBOX_MESSAGE_TYPE, STATE } from "../db/types";
 import { DataSource } from "typeorm";
 import { Snapshot as SagaSnapshot} from "xstate";
-import { InboxMessage } from "src/db/entities/inbox.entity";
+import { InboxMessage } from "../db/entities/inbox.entity";
 
 export class OrdersService {
 
