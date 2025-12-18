@@ -6,11 +6,6 @@ import { Order } from "./db/entities/order.entity";
 import { InboxMessage } from "./db/entities/inbox.entity";
 import { OutboxMessage } from "./db/entities/outbox.entity";
 import { Server } from './server/server';
-import { OrdersService } from './orders/orders.service';
-import { OrdersSagaOrchestrator } from './orders/orchestrator/orders.orchestrator';
-import { RabbitMQService } from './rabbitmq/rabbitmq.service';
-import { InventoryService } from './inventory/inventory.service';
-import { ShippingService } from './shipping/shipping.service';
 
 const main = async () => {
 	const datasource = new DataSource({
@@ -24,20 +19,7 @@ const main = async () => {
 	})
 	await datasource.initialize()
 
-	const ordersService = new OrdersService(datasource)
-
-	const inventoryService = new InventoryService(datasource)
-
-	const shippingService = new ShippingService(datasource, ordersService)
-
-	const orchestrator = new OrdersSagaOrchestrator(ordersService, inventoryService, shippingService, datasource)
-	await orchestrator.restoreFromDatabase()
-
-	const rabbitMQService = new RabbitMQService(datasource, orchestrator)
-	await rabbitMQService.init()
-	rabbitMQService.pollOutbox()
-
-	const server = new Server(Number(process.env.APP_PORT), orchestrator)
+	const server = new Server(Number(process.env.APP_PORT))
 
 	server.init()
 }

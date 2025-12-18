@@ -1,12 +1,11 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import { HTTP_METHOD } from './types'
-import { OrdersSagaOrchestrator } from 'src/orders/orchestrator/orders.orchestrator'
 
 export class Server {
 	private app: express.Express
 
-	constructor(private port: number, private orderSagaOrchestrator: OrdersSagaOrchestrator) {}
+	constructor(private port: number) {}
 
 	init() {
 		this.app = express()
@@ -18,7 +17,7 @@ export class Server {
 
 	private placeOrder = async (req: express.Request, res: express.Response) => {
 		const {productId, quantity}: {productId: number, quantity: number} = req.body
-		this.orderSagaOrchestrator.createOrder(productId, quantity)
+		console.log(`got message for ${productId} with quantity ${quantity}`)
 		res.send()
 	}
 
