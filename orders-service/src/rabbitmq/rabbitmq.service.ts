@@ -62,11 +62,11 @@ export class RabbitMQService {
 				const buffer = Buffer.from(JSON.stringify(json))
 				switch (outboxMessage.messageType) {
 					case OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY: 
-						console.log('sending remove inventory message')
+						console.log(`sending remove inventory message for order with id ${outboxMessage.orderId}`)
 						this.channel.sendToQueue(QUEUE.REMOVE_INVENTORY, buffer)
 						break;
 					default: 
-						console.log('sending ship order message')
+						console.log(`sending ship order message for order with id ${outboxMessage.orderId}`)
 						this.channel.sendToQueue(QUEUE.SHIP_ORDER, buffer)
 				}
 				await outboxRepository.remove(outboxMessage)
