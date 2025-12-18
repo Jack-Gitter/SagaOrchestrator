@@ -20,7 +20,7 @@ export class RemoveInventoryStep implements SagaStepInterface<OrderSagaStepData,
 			const sagaRepository = manager.getRepository(OrderSagaEntity)
 
 			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.INVENTORY_RESPONSE, true)
-			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT,)
+			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT)
 			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.REMOVE_INVENTORY)
 
 			await inboxRepository.save(inboxMessage)
@@ -30,6 +30,12 @@ export class RemoveInventoryStep implements SagaStepInterface<OrderSagaStepData,
     }
 
     async compenstate(data: OrderSagaStepData): Promise<void> {
-		// nothing to compensate, we only wrote an outbox message to the database, and the state of the saga
+		await this.datasource.transaction(async manager => {
+			const outboxRepository = manager.getRepository(OutboxMessage)
+
+			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.RESTORE_INVENTORY)
+
+			await outboxRepository.save(outboxMessage)
+		})
     }
 }
