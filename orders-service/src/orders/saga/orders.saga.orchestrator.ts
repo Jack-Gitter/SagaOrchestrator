@@ -9,7 +9,9 @@ export class OrderSagaOrchestrator {
 	constructor(private orderSagaFactory: OrderSagaFactory) {}
 
 	newSaga(productId: number, quantity: number) {
-		this.orderSagaFactory.createSaga(randomUUID(), productId, quantity)
+		const orderId =randomUUID()
+		const saga = this.orderSagaFactory.createSaga(orderId, productId, quantity)
+		this.sagas.set(orderId, saga)
 	}
 
 	invokeNext(orderId: UUID) {}
