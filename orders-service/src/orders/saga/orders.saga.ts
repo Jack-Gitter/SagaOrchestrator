@@ -1,10 +1,12 @@
 import { UUID } from "node:crypto";
 import { SagaStepInterface } from "./steps/saga.step.interface";
+import { OrderSagaStepData } from "./steps/types";
 
 export class OrderSaga {
 
-	public steps: SagaStepInterface<unknown, unknown>[]
-	public completed: SagaStepInterface<unknown, unknown>[]
+	public steps: SagaStepInterface<OrderSagaStepData, OrderSagaStepData>[]
+	public completed: SagaStepInterface<OrderSagaStepData, OrderSagaStepData>[]
+	public index: number
 	public orderId: UUID
 	public productId: number
 	public quantity: number
@@ -13,5 +15,17 @@ export class OrderSaga {
 		this.orderId = orderId
 		this.productId = productId
 		this.quantity = quantity
+		this.index = 0
+	}
+
+	async invokeNext() {
+		await this.steps[this.index].invoke({orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
+		this.completed.push(this.steps[this.index])
+	}
+
+	async compensate() {
+		await Promise.all(this.completed.map(async step => {
+			return await step.compenstate({orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
+		}))
 	}
 }

@@ -1,6 +1,6 @@
 export interface SagaStepInterface<T, U> {
 
-	run(data: T): Promise<void>
+	invoke(data: T): Promise<void>
 
 	compenstate(data: U): Promise<void>
 

@@ -5,7 +5,7 @@ export class RemoveInventoryStep implements SagaStepInterface<null, null> {
 
 	constructor(private datasource: DataSource) {}
 
-    run(): Promise<void> {
+    invoke(): Promise<void> {
         throw new Error("Method not implemented.");
     }
     compenstate(): Promise<void> {

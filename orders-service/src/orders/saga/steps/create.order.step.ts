@@ -11,7 +11,7 @@ export class CreateOrderStep implements SagaStepInterface<OrderSagaStepData, Ord
 
 	constructor(private datasource: DataSource) {}
 
-    async run(data: OrderSagaStepData): Promise<void> {
+    async invoke(data: OrderSagaStepData): Promise<void> {
 		await this.datasource.transaction(async manager => {
 			const orderRepository = manager.getRepository(Order)
 			const outboxRepository = manager.getRepository(OutboxMessage)

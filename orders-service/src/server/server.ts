@@ -6,7 +6,7 @@ import { OrderSagaOrchestrator } from 'src/orders/saga/orders.saga.orchestrator'
 export class Server {
 	private app: express.Express
 
-	constructor(private port: number, orderSagaOrchestrator: OrderSagaOrchestrator) {}
+	constructor(private port: number, private orderSagaOrchestrator: OrderSagaOrchestrator) {}
 
 	init() {
 		this.app = express()
@@ -17,7 +17,7 @@ export class Server {
 
 	private placeOrder = async (req: express.Request, res: express.Response) => {
 		const {productId, quantity}: {productId: number, quantity: number} = req.body
-		console.log(`got message for ${productId} with quantity ${quantity}`)
+		this.orderSagaOrchestrator.newSaga(productId, quantity)
 		res.send()
 	}
 
