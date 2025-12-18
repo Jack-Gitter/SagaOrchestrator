@@ -17,8 +17,10 @@ export class OrderSagaEntity {
 	@Column({type: 'enum', enum: LAST_COMPLETED_STEP})
 	lastCompletedStep: LAST_COMPLETED_STEP 
 
-	constructor(orderId: UUID, lastCompletedStep: LAST_COMPLETED_STEP) {
+	constructor(orderId: UUID, productId: number, quantity: number, lastCompletedStep: LAST_COMPLETED_STEP) {
 		this.orderId = orderId
+		this.productId = productId
+		this.quantity = quantity
 		this.lastCompletedStep = lastCompletedStep
 	}
 
