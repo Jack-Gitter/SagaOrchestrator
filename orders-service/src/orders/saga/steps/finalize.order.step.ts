@@ -20,7 +20,7 @@ export class FinalizeOrderStep implements SagaStepInterface<OrderSagaStepData, O
 			const orderRepository = manager.getRepository(Order)
 
 			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.FINALIZE_ORDER, true)
-			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.REMOVE_INVENTORY)
+			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.FINALIZE_ORDER)
 			const order = await orderRepository.findOneBy({orderId: data.orderId})
 			order.status = ORDER_STATUS.FULFILLED
 
