@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 import { SagaStepInterface } from "./saga.step.interface";
-import { STEP } from "src/db/entities/types";
+import { STEP } from "../../../db/entities/types";
 
 export class ShipOrderStep implements SagaStepInterface<null, null> {
 

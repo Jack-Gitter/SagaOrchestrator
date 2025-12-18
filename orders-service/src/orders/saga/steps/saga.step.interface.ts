@@ -1,4 +1,4 @@
-import { STEP } from "src/db/entities/types"
+import { STEP } from "../../../db/entities/types"
 
 export interface SagaStepInterface<T, U> {
 

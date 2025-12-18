@@ -16,6 +16,8 @@ export class OrderSaga {
 		this.productId = productId
 		this.quantity = quantity
 		this.index = 0
+		this.steps = []
+		this.completed = []
 	}
 
 	async invokeNext() {

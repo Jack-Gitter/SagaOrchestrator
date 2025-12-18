@@ -2,7 +2,7 @@ import { randomUUID, UUID } from "node:crypto";
 import { OrderSaga } from "./orders.saga";
 import { OrderSagaFactory } from "./orders.saga.factory";
 import { DataSource } from "typeorm";
-import { OrderSagaEntity } from "src/db/entities/saga.entity";
+import { OrderSagaEntity } from "../../db/entities/saga.entity";
 
 export class OrderSagaOrchestrator {
 

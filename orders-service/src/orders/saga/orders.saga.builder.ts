@@ -18,6 +18,7 @@ export class OrderSagaBuilder {
 	}
 
 	setStep(lastCompletedStep: STEP) {
+		if (!lastCompletedStep) return
 		for (const step of this.orderSaga.steps) {
 			if (step.step === lastCompletedStep) {
 				this.orderSaga.completed.push(step)
