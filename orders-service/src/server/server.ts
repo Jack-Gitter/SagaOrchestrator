@@ -1,11 +1,12 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import { HTTP_METHOD } from './types'
+import { OrderSagaOrchestrator } from 'src/orders/saga/orders.saga.orchestrator'
 
 export class Server {
 	private app: express.Express
 
-	constructor(private port: number) {}
+	constructor(private port: number, orderSagaOrchestrator: OrderSagaOrchestrator) {}
 
 	init() {
 		this.app = express()

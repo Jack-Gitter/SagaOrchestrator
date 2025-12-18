@@ -4,13 +4,14 @@ import { CreateOrderStep } from "./steps/create.order.step"
 import { RemoveInventoryStep } from "./steps/remove.inventory.step"
 import { ShipOrderStep } from "./steps/ship.order.step"
 import { FinalizeOrderStep } from "./steps/finalize.order.step"
+import { UUID } from "node:crypto"
 
 export class OrderSagaFactory {
 
 	constructor(private datasource: DataSource) {}
 
-	createSaga() {
-		const builder = new OrderSagaBuilder
+	createSaga(orderId: UUID, productId: number, quantity: number) {
+		const builder = new OrderSagaBuilder(orderId)
 
 		builder.addStep(new CreateOrderStep(this.datasource))
 		.addStep(new RemoveInventoryStep(this.datasource))

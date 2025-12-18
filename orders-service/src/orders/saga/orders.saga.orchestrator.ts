@@ -1,11 +1,16 @@
-import { UUID } from "node:crypto";
+import { randomUUID, UUID } from "node:crypto";
 import { OrderSaga } from "./orders.saga";
+import { OrderSagaFactory } from "./orders.saga.factory";
 
 export class OrderSagaOrchestrator {
 
 	private sagas = new Map<UUID, OrderSaga>();
 
-	constructor() {}
+	constructor(private orderSagaFactory: OrderSagaFactory) {}
+
+	createNewSaga(productId: number, quantity: number) {
+		this.orderSagaFactory.createSaga(randomUUID())
+	}
 
 	invokeNext(orderId: UUID) {}
 
