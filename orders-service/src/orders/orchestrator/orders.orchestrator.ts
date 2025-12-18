@@ -114,8 +114,26 @@ export class OrdersSagaOrchestrator {
 					}
 				},
 				handleShippingResponse: {},
-				error: {type: 'final'},
-				complete: {type: 'final'},
+				error: {
+					type: 'final',
+					invoke: {
+						src: 'persistState',
+						input: ({context}) => ({
+							orderId: context.orderId, 
+							state: STATE.ERROR
+						}),
+					}
+				},
+				complete: {
+					type: 'final',
+					invoke: {
+						src: 'persistState',
+						input: ({context}) => ({
+							orderId: context.orderId, 
+							state: STATE.COMPLETE
+						}),
+					}
+				},
 
 			},
 		})
