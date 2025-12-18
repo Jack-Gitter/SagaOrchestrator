@@ -2,12 +2,14 @@ import * as amqplib from 'amqplib'
 import { DataSource } from 'typeorm';
 import { OutboxMessage } from '../db/entities/outbox.entity';
 import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from '../db/types';
+import { OrderSagaOrchestrator } from 'src/orders/saga/orders.saga.orchestrator';
+import { InventoryResponseMessage } from './types';
 
 export class RabbitMQService {
 
 	private channel: amqplib.Channel
 
-	constructor(private datasource: DataSource) {
+	constructor(private datasource: DataSource, private orderSagaOrchestrator: OrderSagaOrchestrator) {
 		this.pollOutbox()
 	}
 
@@ -25,6 +27,17 @@ export class RabbitMQService {
 	  for (const queue of Object.values(INBOX_MESSAGE_TYPE)) {
 		await channel.assertQueue(queue)
 	  }
+	}
+
+	listenForRemoveInventoryResponse = async () => {
+		await this.channel.consume(INBOX_MESSAGE_TYPE.INVENTORY_RESPONSE, async (msg) => {
+			if (msg !== null) {
+				const message: InventoryResponseMessage = JSON.parse(msg.content.toString())
+				console.log(`Received message with orderId ${message.orderId} and status ${message.success}`);
+				await this.orderSagaOrchestrator.invokeNext(message.orderId, message.id)
+				this.channel.ack(msg)
+			}
+		})
 	}
 
 	pollOutbox = () => {
