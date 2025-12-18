@@ -11,15 +11,14 @@ export class InventoryService {
 	constructor(private datasource: DataSource) {}
 
 	handleInventoryMessage = async (orderId: UUID, productId: number, quantity: number, successful: boolean, sagaSnapshot: SagaSnapshot<unknown>) => {
-		console.log('handling inventory message')
-		const snapshotRepository = this.datasource.getRepository(Snapshot)
-		const snap = await snapshotRepository.findOneBy({orderId})
-		if (snap?.state === STATE.HANDLE_INVENTORY_RESPONSE) {
-			console.log('already handled inventory message, skipping')
-			return;
-		}
+		console.log('handling inventory response message')
 		await this.datasource.transaction(async manager => {
 			const inboxRepository = manager.getRepository(InboxMessage)
+			const existingInboxMessage = inboxRepository.findOneBy({orderId: orderId, messageType: INBOX_MESSAGE_TYPE.INVENTORY_REMOVE_RESPONSE})
+			if (existingInboxMessage) {
+				return;
+			}
+
 			const outboxRepository = manager.getRepository(OutboxMessage)
 			const snapshotRepository = manager.getRepository(Snapshot)
 
