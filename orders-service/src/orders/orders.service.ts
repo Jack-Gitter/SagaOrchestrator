@@ -34,11 +34,12 @@ export class OrdersService {
 		})
 	}
 
-	finalizeOrder = async (messageId: UUID, orderId: UUID) => {
+	finalizeOrder = async (messageId: UUID, orderId: UUID, snapshot: SagaSnapshot<unknown>) => {
 		console.log(`finalizing order with id ${orderId}`)
 		await this.datasource.transaction(async manager => {
 
 			const inboxRepository = this.datasource.getRepository(InboxMessage)
+			const snapshotRepository = this.datasource.getRepository(Snapshot)
 			const orderRepository = manager.getRepository(Order)
 			const message = await inboxRepository.findOneBy({id: messageId})
 			if (message) {
@@ -46,11 +47,13 @@ export class OrdersService {
 				return;
 			}
 
+			const snap = new Snapshot(orderId, STATE.COMPLETE, snapshot)
 			const inboxMessage = new InboxMessage(messageId, orderId, INBOX_MESSAGE_TYPE.SHIPPING_RESPONSE, true)
 			const existingOrder = await orderRepository.findOneBy({orderId})
 
 			existingOrder.status = ORDER_STATUS.FULFILLED
 
+			await snapshotRepository.save(snap)
 			await inboxRepository.save(inboxMessage)
 			await orderRepository.save(existingOrder)
 
