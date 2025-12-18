@@ -1,6 +1,6 @@
 import { UUID } from "node:crypto";
 
-export interface CreateOrderStepData {
+export interface OrderSagaStepData {
 	orderId: UUID,
 	productId: number,
 	quantity: number

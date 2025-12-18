@@ -2,14 +2,14 @@ import { DataSource } from "typeorm";
 import { SagaStepInterface } from "./saga.step.interface";
 import { Order } from "src/db/entities/order.entity";
 import { OutboxMessage } from "src/db/entities/outbox.entity";
-import { CreateOrderStepData } from "./types";
 import { ORDER_STATUS, OUTBOX_MESSAGE_TYPE } from "src/db/types";
+import { OrderSagaStepData } from "./types";
 
-export class CreateOrderStep implements SagaStepInterface<CreateOrderStepData, CreateOrderStepData> {
+export class CreateOrderStep implements SagaStepInterface<OrderSagaStepData, OrderSagaStepData> {
 
 	constructor(private datasource: DataSource) {}
 
-    async run(data: CreateOrderStepData): Promise<void> {
+    async run(data: OrderSagaStepData): Promise<void> {
 		await this.datasource.transaction(async manager => {
 			const orderRepository = manager.getRepository(Order)
 			const outboxRepository = manager.getRepository(OutboxMessage)
@@ -27,7 +27,7 @@ export class CreateOrderStep implements SagaStepInterface<CreateOrderStepData, C
 		})
     }
 
-    async compenstate(data: CreateOrderStepData): Promise<void> {
+    async compenstate(data: OrderSagaStepData): Promise<void> {
 		await this.datasource.transaction(async manager => {
 			const orderRepository = manager.getRepository(Order)
 
