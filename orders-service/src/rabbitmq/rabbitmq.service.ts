@@ -1,7 +1,7 @@
 import * as amqplib from 'amqplib'
 import { DataSource } from 'typeorm';
-import { OutboxMessage } from 'src/db/entities/outbox.entity';
-import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from 'src/db/types';
+import { OutboxMessage } from '../db/entities/outbox.entity';
+import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from '../db/types';
 
 export class RabbitMQService {
 
