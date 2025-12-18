@@ -35,7 +35,7 @@ export class RabbitMQService {
 		await this.channel.consume(QUEUE.REMOVE_INVENTORY_RESPONSE, async (msg) => {
 			if (msg !== null) {
 					const message: InventoryResponseMessage = JSON.parse(msg.content.toString())
-					console.log(`Received message with orderId ${message.orderId} and status ${message.successful}`);
+					console.log(`Received message with orderId ${message.orderId} and status ${message.successful} from queue ${QUEUE.REMOVE_INVENTORY_RESPONSE}`);
 					await this.orderSagaOrchestrator.handleInventoryResponseMessage(message.orderId, message.successful, message.id)
 					this.channel.ack(msg)
 			}
@@ -46,7 +46,7 @@ export class RabbitMQService {
 		await this.channel.consume(QUEUE.SHIP_ORDER_RESPONSE, async (msg) => {
 			if (msg !== null) {
 					const message: ShippingResponseMessage = JSON.parse(msg.content.toString())
-					console.log(`Received message with orderId ${message.orderId} and status ${message.successful}`);
+					console.log(`Received message with orderId ${message.orderId} and status ${message.successful} from queue ${QUEUE.SHIP_ORDER_RESPONSE}`);
 					await this.orderSagaOrchestrator.handleShippingResponseMessage(message.orderId, message.successful, message.id)
 					this.channel.ack(msg)
 			}
