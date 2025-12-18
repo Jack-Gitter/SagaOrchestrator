@@ -35,13 +35,6 @@ export class RabbitMQService {
 			if (msg !== null) {
 					const message: InventoryResponseMessage = JSON.parse(msg.content.toString())
 					console.log(`Received message with orderId ${message.orderId} and status ${message.successful}`);
-					const inboxRepository = this.datasource.getRepository(InboxMessage)
-					const inboxMessage = await inboxRepository.findOneBy({id: message.id})
-					if (inboxMessage) {
-						console.log(`Acking already processed message with orderId ${message.orderId} and status ${message.successful}`)
-						this.channel.ack(msg)
-						return;
-					}
 					await this.orderSagaOrchestrator.handleInventoryResponseMessage(message.orderId, message.successful)
 					this.channel.ack(msg)
 				
