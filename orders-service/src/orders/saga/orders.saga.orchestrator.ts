@@ -9,7 +9,7 @@ export class OrderSagaOrchestrator {
 	constructor(private orderSagaFactory: OrderSagaFactory) {}
 
 	createNewSaga(productId: number, quantity: number) {
-		this.orderSagaFactory.createSaga(randomUUID())
+		this.orderSagaFactory.createSaga(randomUUID(), productId, quantity)
 	}
 
 	invokeNext(orderId: UUID) {}
