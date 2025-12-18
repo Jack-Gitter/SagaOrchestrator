@@ -1,12 +1,13 @@
 import { randomUUID, UUID } from "node:crypto";
 import { OrderSaga } from "./orders.saga";
 import { OrderSagaFactory } from "./orders.saga.factory";
+import { DataSource } from "typeorm";
 
 export class OrderSagaOrchestrator {
 
 	private sagas = new Map<UUID, OrderSaga>();
 
-	constructor(private orderSagaFactory: OrderSagaFactory) {}
+	constructor(private orderSagaFactory: OrderSagaFactory, private datasource: DataSource) {}
 
 	newSaga(productId: number, quantity: number) {
 		const orderId =randomUUID()
