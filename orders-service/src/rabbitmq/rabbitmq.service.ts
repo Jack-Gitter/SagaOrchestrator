@@ -31,11 +31,12 @@ export class RabbitMQService {
 		const outboxRepository = this.datasource.getRepository(OutboxMessage)
 		setInterval(async () => {
 			const outboxMessages = await outboxRepository.find()
-			outboxMessages.forEach(async message => {
-				const json = message.toJson();
+			outboxMessages.forEach(async outboxMessage => {
+				const json = outboxMessage.toJson();
 				const buffer = Buffer.from(JSON.stringify(json))
-				console.log(`sending outbox message to ${message.messageType} queue`)
-				this.channel.sendToQueue(message.messageType, buffer)
+				console.log(`sending outbox message to ${outboxMessage.messageType} queue`)
+				this.channel.sendToQueue(outboxMessage.messageType, buffer)
+				await outboxRepository.remove(outboxMessage)
 			})
 		}, 5000)
 	}

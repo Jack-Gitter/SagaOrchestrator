@@ -23,6 +23,8 @@ const main = async () => {
 	await datasource.initialize()
 
 	const rabbitMQService = new RabbitMQService(datasource)
+	await rabbitMQService.init()
+
 	const orderSagaFactory = new OrderSagaFactory(datasource)
 	const orderSagaOrchestrator = new OrderSagaOrchestrator(orderSagaFactory, datasource)
 	await orderSagaOrchestrator.restoreFromDb()
