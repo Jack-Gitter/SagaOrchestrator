@@ -14,8 +14,9 @@ export class InventoryService {
 		console.log('handling inventory response message')
 		await this.datasource.transaction(async manager => {
 			const inboxRepository = manager.getRepository(InboxMessage)
-			const existingInboxMessage = inboxRepository.findOneBy({orderId: orderId, messageType: INBOX_MESSAGE_TYPE.INVENTORY_REMOVE_RESPONSE})
+			const existingInboxMessage = await inboxRepository.findOneBy({orderId: orderId, messageType: INBOX_MESSAGE_TYPE.INVENTORY_REMOVE_RESPONSE})
 			if (existingInboxMessage) {
+				console.log('already handled inventory message, skipping')
 				return;
 			}
 

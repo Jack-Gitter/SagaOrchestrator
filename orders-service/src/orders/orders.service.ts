@@ -17,6 +17,7 @@ export class OrdersService {
 			const orderRepository = manager.getRepository(Order)
 			const existingOrder = await orderRepository.findOneBy({orderId})
 			if (existingOrder) {
+				console.log('already created order, skipping')
 				return;
 			}
 			const outboxRepository = manager.getRepository(OutboxMessage)
