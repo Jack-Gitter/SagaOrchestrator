@@ -12,3 +12,9 @@ export interface InventoryResponseMessage {
 	orderId: UUID,
 	successful: boolean
 }
+
+export interface ShippingResponseMessage {
+	id: UUID,
+	orderId: UUID,
+	successful: boolean
+}

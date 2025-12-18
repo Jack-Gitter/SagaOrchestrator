@@ -10,6 +10,7 @@ import { OrdersService } from './orders/orders.service';
 import { OrdersSagaOrchestrator } from './orders/orchestrator/orders.orchestrator';
 import { RabbitMQService } from './rabbitmq/rabbitmq.service';
 import { InventoryService } from './inventory/inventory.service';
+import { ShippingService } from './shipping/shipping.service';
 
 const main = async () => {
 	const datasource = new DataSource({
@@ -27,7 +28,9 @@ const main = async () => {
 
 	const inventoryService = new InventoryService(datasource)
 
-	const orchestrator = new OrdersSagaOrchestrator(ordersService, inventoryService, datasource)
+	const shippingService = new ShippingService(datasource, ordersService)
+
+	const orchestrator = new OrdersSagaOrchestrator(ordersService, inventoryService, shippingService, datasource)
 	await orchestrator.restoreFromDatabase()
 
 	const rabbitMQService = new RabbitMQService(datasource, orchestrator)

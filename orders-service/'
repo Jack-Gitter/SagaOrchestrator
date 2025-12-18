@@ -123,13 +123,6 @@ export class OrdersSagaOrchestrator {
 				handleShippingResponse: {
 					invoke: {
 						src: 'handleShippingResponse',
-						input: ({context, event}) => ({
-							messageId: event.messageId,
-							orderId: context.orderId, 
-							productId: context.productId, 
-							quantity: context.quantity,
-							successful: event.successful  
-						}),
 						onDone: {
 							target: 'complete'
 						}
@@ -220,7 +213,6 @@ export class OrdersSagaOrchestrator {
 		}
 
 		actor.send({type: 'handleShippingResponseMessage', successful, messageId })
-
 		await new Promise<void>((resolve) => {
 			const subscription = actor.subscribe((snapshot) => {
 				if (snapshot.matches('waitForShippingResponse')) {

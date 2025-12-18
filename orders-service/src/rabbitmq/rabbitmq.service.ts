@@ -2,7 +2,7 @@ import * as amqplib from 'amqplib'
 import { OutboxMessage } from '../db/entities/outbox.entity';
 import { OUTBOX_MESSAGE_TYPE } from '../db/types';
 import { DataSource } from 'typeorm';
-import { InventoryResponseMessage, QUEUE } from './types';
+import { InventoryResponseMessage, QUEUE, ShippingResponseMessage } from './types';
 import { OrdersSagaOrchestrator } from '../orders/orchestrator/orders.orchestrator';
 import { InboxMessage } from '../db/entities/inbox.entity';
 
@@ -37,7 +37,17 @@ export class RabbitMQService {
 					console.log(`Received message with orderId ${message.orderId} and status ${message.successful}`);
 					await this.orderSagaOrchestrator.handleInventoryResponseMessage(message.orderId, message.successful, message.id)
 					this.channel.ack(msg)
-				
+			}
+		})
+	}
+
+	listenForShippingResponse = async () => {
+		await this.channel.consume(QUEUE.SHIP_ORDER_RESPONSE, async (msg) => {
+			if (msg !== null) {
+					const message: ShippingResponseMessage = JSON.parse(msg.content.toString())
+					console.log(`Received message with orderId ${message.orderId} and status ${message.successful}`);
+					await this.orderSagaOrchestrator.handleShippingResponseMessage(message.orderId, message.successful, message.id)
+					this.channel.ack(msg)
 			}
 		})
 	}

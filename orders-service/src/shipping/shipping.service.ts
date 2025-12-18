@@ -7,7 +7,9 @@ export class ShippingService {
 
 	constructor(private datasource: DataSource, private ordersService: OrdersService) {}
 
-	handleShippingMessage = async (orderId: UUID) => {
-		await this.ordersService.finalizeOrder(orderId)
+	handleShippingMessage = async (messageId: UUID, orderId: UUID, productId: number, quantity: number, successful: boolean) => {
+		if (successful) {
+			await this.ordersService.finalizeOrder(messageId, orderId)
+		}
 	}
 }

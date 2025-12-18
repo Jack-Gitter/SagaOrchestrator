@@ -2,9 +2,10 @@ import { UUID } from "node:crypto";
 import { Order } from "../db/entities/order.entity";
 import { OutboxMessage } from "../db/entities/outbox.entity";
 import { Snapshot } from "../db/entities/snapshot.entity";
-import { ORDER_STATUS, OUTBOX_MESSAGE_TYPE, STATE } from "../db/types";
+import { INBOX_MESSAGE_TYPE, ORDER_STATUS, OUTBOX_MESSAGE_TYPE, STATE } from "../db/types";
 import { DataSource } from "typeorm";
 import { Snapshot as SagaSnapshot} from "xstate";
+import { InboxMessage } from "src/db/entities/inbox.entity";
 
 export class OrdersService {
 
@@ -33,12 +34,25 @@ export class OrdersService {
 		})
 	}
 
-	finalizeOrder = async (orderId: UUID) => {
+	finalizeOrder = async (messageId: UUID, orderId: UUID) => {
 		await this.datasource.transaction(async manager => {
+
+			const inboxRepository = this.datasource.getRepository(InboxMessage)
 			const orderRepository = manager.getRepository(Order)
+			const message = await inboxRepository.findOneBy({id: messageId})
+			if (message) {
+				return;
+			}
+
+			const inboxMessage = new InboxMessage(messageId, orderId, INBOX_MESSAGE_TYPE.SHIPPING_RESPONSE, true)
 			const existingOrder = await orderRepository.findOneBy({orderId})
+
 			existingOrder.status = ORDER_STATUS.FULFILLED
+
+			await inboxRepository.save(inboxMessage)
 			await orderRepository.save(existingOrder)
+
+
 		})
 	}
 

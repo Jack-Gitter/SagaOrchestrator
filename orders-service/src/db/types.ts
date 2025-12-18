@@ -6,7 +6,8 @@ export enum ORDER_STATUS {
 
 export enum INBOX_MESSAGE_TYPE {
 	RECEIVE_ORDER = 'createPendingOrder',
-	INVENTORY_REMOVE_RESPONSE = 'inventoryRemoveResponse'
+	INVENTORY_REMOVE_RESPONSE = 'inventoryRemoveResponse',
+	SHIPPING_RESPONSE = 'shipping_response'
 }
 
 export enum OUTBOX_MESSAGE_TYPE {
