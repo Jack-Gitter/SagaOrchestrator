@@ -10,7 +10,6 @@ export class RabbitMQService {
 	private channel: amqplib.Channel
 
 	constructor(private datasource: DataSource, private orderSagaOrchestrator: OrderSagaOrchestrator) {
-		this.pollOutbox()
 	}
 
 	async init() {
@@ -27,6 +26,8 @@ export class RabbitMQService {
 	  for (const queue of Object.values(INBOX_MESSAGE_TYPE)) {
 		await channel.assertQueue(queue)
 	  }
+		this.pollOutbox()
+		this.listenForRemoveInventoryResponse()
 	}
 
 	listenForRemoveInventoryResponse = async () => {
