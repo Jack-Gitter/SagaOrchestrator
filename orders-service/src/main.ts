@@ -8,6 +8,7 @@ import { Server } from './server/server';
 import { OrderSagaOrchestrator } from './orders/saga/orders.saga.orchestrator';
 import { OrderSagaFactory } from './orders/saga/orders.saga.factory';
 import { OrderSagaEntity } from './db/entities/saga.entity';
+import { RabbitMQService } from './rabbitmq/rabbitmq.service';
 
 const main = async () => {
 	const datasource = new DataSource({
@@ -21,6 +22,7 @@ const main = async () => {
 	})
 	await datasource.initialize()
 
+	const rabbitMQService = new RabbitMQService(datasource)
 	const orderSagaFactory = new OrderSagaFactory(datasource)
 	const orderSagaOrchestrator = new OrderSagaOrchestrator(orderSagaFactory, datasource)
 	await orderSagaOrchestrator.restoreFromDb()

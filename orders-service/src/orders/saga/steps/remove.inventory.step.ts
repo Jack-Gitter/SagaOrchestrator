@@ -2,10 +2,10 @@ import { DataSource } from "typeorm";
 import { SagaStepInterface } from "./saga.step.interface";
 import { STEP } from "../../../db/entities/types";
 import { OrderSagaStepData } from "./types";
-import { InboxMessage } from "src/db/entities/inbox.entity";
-import { OutboxMessage } from "src/db/entities/outbox.entity";
-import { OrderSagaEntity } from "src/db/entities/saga.entity";
-import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from "src/db/types";
+import { InboxMessage } from "../../../db/entities/inbox.entity";
+import { OutboxMessage } from "../../../db/entities/outbox.entity";
+import { OrderSagaEntity } from "../../../db/entities/saga.entity";
+import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from "../../../db/types";
 
 export class RemoveInventoryStep implements SagaStepInterface<OrderSagaStepData, OrderSagaStepData> {
 

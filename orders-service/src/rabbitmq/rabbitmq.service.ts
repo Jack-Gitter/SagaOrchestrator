@@ -7,7 +7,9 @@ export class RabbitMQService {
 
 	private channel: amqplib.Channel
 
-	constructor(private datasource: DataSource) {}
+	constructor(private datasource: DataSource) {
+		this.pollOutbox()
+	}
 
 	async init() {
 	  const connection = await amqplib.connect({
@@ -23,11 +25,6 @@ export class RabbitMQService {
 	  for (const queue of Object.values(INBOX_MESSAGE_TYPE)) {
 		await channel.assertQueue(queue)
 	  }
-	}
-
-
-	sendMessage = (queue: string, message: Buffer) => {
-		this.channel.sendToQueue(queue, message)
 	}
 
 	pollOutbox = () => {
