@@ -15,9 +15,15 @@ export class OrderSagaOrchestrator {
 		this.sagas.set(orderId, saga)
 	}
 
-	invokeNext(orderId: UUID) {}
+	async invokeNext(orderId: UUID) {
+		const saga = this.sagas.get(orderId)
+		await saga.invokeNext()
+	}
 
-	rollbackSaga(orderId: UUID) {}
+	async compensateSaga(orderId: UUID) {
+		const saga = this.sagas.get(orderId)
+		await saga.compensate()
+	}
 
 	handleMessage(message: any) {
 		// extract the orderId
