@@ -55,7 +55,14 @@ export class OrdersSagaOrchestrator {
 					await this.persisState(input.orderId, input.state)
 				}),
 				handleShippingResponse: fromPromise(async ({input}: {input: {messageId: UUID, orderId: UUID, productId: number, successful: boolean, quantity: number}}) => {
-					await this.shippingService.handleShippingMessage(input.messageId, input.orderId, input.productId, input.quantity, input.successful)
+					await this.shippingService.handleShippingMessage(
+						input.messageId, 
+						input.orderId, 
+						input.productId, 
+						input.quantity, 
+						input.successful, 
+						this.actors.get(input.orderId).getPersistedSnapshot()
+					)
 				})
 
 			},
