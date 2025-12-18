@@ -10,7 +10,6 @@ export class Server {
 	init() {
 		this.app = express()
 		this.app.use(bodyParser.json())
-		this.registerRoute('/', HTTP_METHOD.GET, this.homeRoute)
 		this.registerRoute('/', HTTP_METHOD.POST, this.placeOrder)
 		this.listen()
 	}
@@ -32,10 +31,6 @@ export class Server {
 			default: 
 				throw new Error('not supported')
 		}
-	}
-
-	private homeRoute = (req: express.Request, res: express.Response) => {
-		res.send('Hello World!')
 	}
 
 	private listen = () => {

@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import "reflect-metadata"
 import { DataSource } from "typeorm";
-import { Snapshot } from "./db/entities/snapshot.entity";
 import { Order } from "./db/entities/order.entity";
 import { InboxMessage } from "./db/entities/inbox.entity";
 import { OutboxMessage } from "./db/entities/outbox.entity";
@@ -15,7 +14,7 @@ const main = async () => {
 		username: process.env.PG_USERNAME,
 		password: process.env.PG_PASSWORD,
 		database: process.env.PG_DATABASE,
-		entities: [InboxMessage, OutboxMessage, Order, Snapshot]
+		entities: [InboxMessage, OutboxMessage, Order]
 	})
 	await datasource.initialize()
 
