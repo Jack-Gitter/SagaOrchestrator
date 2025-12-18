@@ -17,7 +17,7 @@ export class Server {
 
 	private placeOrder = async (req: express.Request, res: express.Response) => {
 		const {productId, quantity}: {productId: number, quantity: number} = req.body
-		this.orderSagaOrchestrator.newSaga(productId, quantity)
+		await this.orderSagaOrchestrator.newSaga(productId, quantity)
 		res.send()
 	}
 

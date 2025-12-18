@@ -10,10 +10,11 @@ export class OrderSagaOrchestrator {
 
 	constructor(private orderSagaFactory: OrderSagaFactory, private datasource: DataSource) {}
 
-	newSaga(productId: number, quantity: number) {
+	async newSaga(productId: number, quantity: number) {
 		const orderId = randomUUID()
 		const saga = this.orderSagaFactory.createSaga(orderId, productId, quantity)
 		this.sagas.set(orderId, saga)
+		await this.invokeNext(orderId)
 	}
 
 	async invokeNext(orderId: UUID) {

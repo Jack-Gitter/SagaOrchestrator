@@ -21,6 +21,7 @@ export class OrderSaga {
 	async invokeNext() {
 		await this.steps[this.index].invoke({orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
 		this.completed.push(this.steps[this.index])
+		this.index+=1
 	}
 
 	async compensate() {
