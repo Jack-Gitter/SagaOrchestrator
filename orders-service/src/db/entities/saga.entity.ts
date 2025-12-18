@@ -3,7 +3,7 @@ import { Column, Entity } from "typeorm";
 import { LAST_COMPLETED_STEP } from "./types";
 
 @Entity('saga')
-export class Saga {
+export class OrderSagaEntity {
 
 	@Column({type: 'uuid', primary: true})
 	orderId: UUID
