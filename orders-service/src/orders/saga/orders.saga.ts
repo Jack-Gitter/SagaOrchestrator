@@ -20,15 +20,15 @@ export class OrderSaga {
 		this.completed = []
 	}
 
-	async invokeNext() {
-		await this.steps[this.index].invoke({orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
+	async invokeNext(messageId?: UUID) {
+		await this.steps[this.index].invoke({messageId, orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
 		this.completed.push(this.steps[this.index])
 		this.index+=1
 	}
 
-	async compensate() {
+	async compensate(messageId?: UUID) {
 		await Promise.all(this.completed.map(async step => {
-			return await step.compenstate({orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
+			return await step.compenstate({messageId, orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
 		}))
 	}
 }

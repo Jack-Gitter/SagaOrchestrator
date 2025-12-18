@@ -17,14 +17,14 @@ export class OrderSagaOrchestrator {
 		await this.invokeNext(orderId)
 	}
 
-	async invokeNext(orderId: UUID) {
+	async invokeNext(orderId: UUID, messageId?: UUID) {
 		const saga = this.sagas.get(orderId)
-		await saga.invokeNext()
+		await saga.invokeNext(messageId)
 	}
 
-	async compensateSaga(orderId: UUID) {
+	async compensateSaga(orderId: UUID, messageId?: UUID) {
 		const saga = this.sagas.get(orderId)
-		await saga.compensate()
+		await saga.compensate(messageId)
 	}
 
 	handleMessage(message: any) {

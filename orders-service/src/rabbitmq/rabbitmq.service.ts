@@ -30,7 +30,6 @@ export class RabbitMQService {
 		this.channel.sendToQueue(queue, message)
 	}
 
-
 	pollOutbox = () => {
 		const outboxRepository = this.datasource.getRepository(OutboxMessage)
 		setInterval(async () => {
