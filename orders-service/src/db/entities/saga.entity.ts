@@ -8,6 +8,12 @@ export class Saga {
 	@Column({type: 'uuid', primary: true})
 	orderId: UUID
 
+	@Column()
+	productId: number
+
+	@Column()
+	quantity: number
+
 	@Column({type: 'enum', enum: LAST_COMPLETED_STEP})
 	lastCompletedStep: LAST_COMPLETED_STEP 
 
