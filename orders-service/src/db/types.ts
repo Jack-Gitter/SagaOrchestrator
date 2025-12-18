@@ -7,7 +7,8 @@ export enum ORDER_STATUS {
 export enum INBOX_MESSAGE_TYPE {
 	CREATE_ORDER = 'createPendingOrder',
 	INVENTORY_RESPONSE = 'inventoryResponse',
-	SHIPPING_RESPONSE = 'shippingResponse'
+	SHIPPING_RESPONSE = 'shippingResponse',
+	FINALIZE_ORDER = 'finalizeOrder'
 }
 
 export enum OUTBOX_MESSAGE_TYPE {
