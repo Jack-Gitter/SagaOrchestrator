@@ -184,8 +184,8 @@ export class OrdersSagaOrchestrator {
 				const actor = createActor(machine, {snapshot: JSON.parse(snapshot)})
 				const orderId = actor.getSnapshot().context.orderId
 				this.actors.set(orderId, actor)
+				console.log(`Restored saga from snapshot for saga with orderId ${orderId} in state ${actor.getSnapshot().value}`)
 				actor.start()
-				console.log(`Restored saga from snapshot for saga with orderId ${orderId}`)
 			})
 		}
 	}
