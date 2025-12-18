@@ -5,9 +5,11 @@ import { OutboxMessage } from "src/db/entities/outbox.entity";
 import { ORDER_STATUS, OUTBOX_MESSAGE_TYPE } from "src/db/types";
 import { OrderSagaStepData } from "./types";
 import { OrderSagaEntity } from "src/db/entities/saga.entity";
-import { LAST_COMPLETED_STEP } from "src/db/entities/types";
+import { STEP } from "src/db/entities/types";
 
 export class CreateOrderStep implements SagaStepInterface<OrderSagaStepData, OrderSagaStepData> {
+
+	public step: STEP = STEP.CREATE_ORDER
 
 	constructor(private datasource: DataSource) {}
 
@@ -24,7 +26,7 @@ export class CreateOrderStep implements SagaStepInterface<OrderSagaStepData, Ord
 
 			const order = new Order(data.orderId, data.productId, data.quantity)
 			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
-			const orderSagaEntity = new OrderSagaEntity(data.orderId, data.quantity, data.productId, LAST_COMPLETED_STEP.CREATE_ORDER)
+			const orderSagaEntity = new OrderSagaEntity(data.orderId, data.quantity, data.productId, STEP.CREATE_ORDER)
 
 			await orderRepository.save(order)
 			await outboxRepository.save(outboxMessage)

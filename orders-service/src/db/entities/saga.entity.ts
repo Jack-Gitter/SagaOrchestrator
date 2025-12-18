@@ -1,6 +1,6 @@
 import { UUID } from "node:crypto";
 import { Column, Entity } from "typeorm";
-import { LAST_COMPLETED_STEP } from "./types";
+import { STEP } from "./types";
 
 @Entity('saga')
 export class OrderSagaEntity {
@@ -14,10 +14,10 @@ export class OrderSagaEntity {
 	@Column()
 	quantity: number
 
-	@Column({type: 'enum', enum: LAST_COMPLETED_STEP})
-	lastCompletedStep: LAST_COMPLETED_STEP 
+	@Column({type: 'enum', enum: STEP})
+	lastCompletedStep: STEP 
 
-	constructor(orderId: UUID, productId: number, quantity: number, lastCompletedStep: LAST_COMPLETED_STEP) {
+	constructor(orderId: UUID, productId: number, quantity: number, lastCompletedStep: STEP) {
 		this.orderId = orderId
 		this.productId = productId
 		this.quantity = quantity

@@ -1,6 +1,6 @@
-export enum LAST_COMPLETED_STEP {
+export enum STEP {
 	CREATE_ORDER = 'createOrder',
-	RESERVE_INVENTORY = 'reserveInventory',
+	REMOVE_INVENTORY = 'removeInventory',
 	SHIP_ORDER = 'shipOrder',
 	FINALIZE_ORDER = 'finalizeOrder'
 }
