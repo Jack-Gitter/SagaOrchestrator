@@ -116,6 +116,13 @@ export class OrdersSagaOrchestrator {
 					}
 				},
 				waitForShippingResponse: {
+					invoke: {
+						src: 'persistState',
+						input: ({context}) => ({
+							orderId: context.orderId, 
+							state: STATE.WAIT_FOR_SHIPPING_RESPONSE
+						}),
+					},
 					on: {
 						receivedShippingResponse: 'handleShippingResponse'
 					}
@@ -219,7 +226,7 @@ export class OrdersSagaOrchestrator {
 			return;
 		}
 
-		actor.send({type: 'handleShippingResponseMessage', successful, messageId })
+		actor.send({type: 'receivedShippingResponse', successful, messageId })
 
 		await new Promise<void>((resolve) => {
 			const subscription = actor.subscribe((snapshot) => {
