@@ -56,7 +56,6 @@ export class RabbitMQService {
 	pollOutbox = () => {
 		const outboxRepository = this.datasource.getRepository(OutboxMessage)
 		setInterval(async () => {
-			console.log('looking for messages')
 			const outboxMessages = await outboxRepository.find()
 			for (const outboxMessage of outboxMessages) {
 				const json = outboxMessage.toJson();
