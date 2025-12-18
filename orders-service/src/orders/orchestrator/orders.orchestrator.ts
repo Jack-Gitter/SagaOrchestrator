@@ -64,7 +64,6 @@ export class OrdersSagaOrchestrator {
 						this.actors.get(input.orderId).getPersistedSnapshot()
 					)
 				})
-
 			},
 		})
 
