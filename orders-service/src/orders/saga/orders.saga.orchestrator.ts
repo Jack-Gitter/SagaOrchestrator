@@ -2,6 +2,7 @@ import { randomUUID, UUID } from "node:crypto";
 import { OrderSaga } from "./orders.saga";
 import { OrderSagaFactory } from "./orders.saga.factory";
 import { DataSource } from "typeorm";
+import { OrderSagaEntity } from "src/db/entities/saga.entity";
 
 export class OrderSagaOrchestrator {
 
@@ -32,5 +33,19 @@ export class OrderSagaOrchestrator {
 		// either invokeNext or rollbackSaga
 	}
 
-	restoreFromDb() {}
+	async restoreFromDb() {
+		const sagaRepository = this.datasource.getRepository(OrderSagaEntity)
+		const sagaEntities = await sagaRepository.find()
+		const sagas = sagaEntities.map(entity => {
+			return this.orderSagaFactory.createSaga(
+				entity.orderId, 
+				entity.productId, 
+				entity.quantity,
+				entity.lastCompletedStep
+			)
+		})
+		sagas.forEach(saga => {
+			this.sagas.set(saga.orderId, saga)
+		})
+	}
 }
