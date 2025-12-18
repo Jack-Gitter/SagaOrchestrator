@@ -17,4 +17,6 @@ export class OrderSagaOrchestrator {
 		// figure out whether the message was successful
 		// either invokeNext or rollbackSaga
 	}
+
+	restoreFromDb() {}
 }

@@ -1,7 +1,7 @@
-export interface SagaStepInterface {
+export interface SagaStepInterface<T, U> {
 
-	run(): Promise<void>
+	run(data: T): Promise<void>
 
-	compenstate(): Promise<void>
+	compenstate(data: U): Promise<void>
 
 }

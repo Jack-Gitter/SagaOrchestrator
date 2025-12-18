@@ -1,0 +1,19 @@
+import { UUID } from "node:crypto";
+import { Column, Entity } from "typeorm";
+import { LAST_COMPLETED_STEP } from "./types";
+
+@Entity('saga')
+export class Saga {
+
+	@Column({type: 'uuid', primary: true})
+	orderId: UUID
+
+	@Column({type: 'enum', enum: LAST_COMPLETED_STEP})
+	lastCompletedStep: LAST_COMPLETED_STEP 
+
+	constructor(orderId: UUID, lastCompletedStep: LAST_COMPLETED_STEP) {
+		this.orderId = orderId
+		this.lastCompletedStep = lastCompletedStep
+	}
+
+}
