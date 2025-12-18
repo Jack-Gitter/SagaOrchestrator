@@ -3,7 +3,7 @@ import { DataSource } from 'typeorm';
 import { OutboxMessage } from '../db/entities/outbox.entity';
 import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from '../db/types';
 import { OrderSagaOrchestrator } from 'src/orders/saga/orders.saga.orchestrator';
-import { InventoryResponseMessage } from './types';
+import { ResponseMessage } from './types';
 
 export class RabbitMQService {
 
@@ -27,13 +27,13 @@ export class RabbitMQService {
 		await channel.assertQueue(queue)
 	  }
 		this.pollOutbox()
-		this.listenForRemoveInventoryResponse()
+		this.listenForMessage()
 	}
 
-	listenForRemoveInventoryResponse = async () => {
+	listenForMessage = async () => {
 		await this.channel.consume(INBOX_MESSAGE_TYPE.INVENTORY_RESPONSE, async (msg) => {
 			if (msg !== null) {
-				const message: InventoryResponseMessage = JSON.parse(msg.content.toString())
+				const message: ResponseMessage = JSON.parse(msg.content.toString())
 				console.log(`Received message with orderId ${message.orderId} and status ${message.success}`);
 				await this.orderSagaOrchestrator.invokeNext(message.orderId, message.id)
 				this.channel.ack(msg)

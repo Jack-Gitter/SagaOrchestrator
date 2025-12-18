@@ -1,6 +1,6 @@
 import { UUID } from "node:crypto";
 
-export interface InventoryResponseMessage {
+export interface ResponseMessage {
 	id: UUID
 	orderId: UUID
 	success: boolean

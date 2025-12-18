@@ -9,7 +9,9 @@ export class FinalizeOrderStep implements SagaStepInterface<null, null> {
 	constructor(private datasource: DataSource) {}
 
     invoke(): Promise<void> {
-        throw new Error("Method not implemented.");
+		this.datasource.transaction(async manager => {
+
+		})
     }
     compenstate(): Promise<void> {
         throw new Error("Method not implemented.");
