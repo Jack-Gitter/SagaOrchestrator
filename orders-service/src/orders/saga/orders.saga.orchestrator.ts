@@ -38,6 +38,7 @@ export class OrderSagaOrchestrator {
 		const sagaRepository = this.datasource.getRepository(OrderSagaEntity)
 		const sagaEntities = await sagaRepository.find()
 		const sagas = sagaEntities.map(entity => {
+			console.log(`restoring saga with order id ${entity.orderId}. Last completed step was ${entity.lastCompletedStep}`)
 			return this.orderSagaFactory.createSaga(
 				entity.orderId, 
 				entity.productId, 

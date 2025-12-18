@@ -23,6 +23,7 @@ const main = async () => {
 
 	const orderSagaFactory = new OrderSagaFactory(datasource)
 	const orderSagaOrchestrator = new OrderSagaOrchestrator(orderSagaFactory, datasource)
+	await orderSagaOrchestrator.restoreFromDb()
 	const server = new Server(Number(process.env.APP_PORT), orderSagaOrchestrator)
 
 	server.init()
