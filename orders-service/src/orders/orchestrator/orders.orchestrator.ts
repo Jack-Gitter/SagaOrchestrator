@@ -205,6 +205,11 @@ export class OrdersSagaOrchestrator {
 
 		const currentSnapshot = actor.getSnapshot()
     
+		if (!currentSnapshot) {
+			console.log(`Got message with invalid orderId`)
+			return
+		}
+
 		if (!currentSnapshot.matches('waitForInventoryResponse')) {
 			console.log(`Already processed inventory response for orderId ${orderId} (current state: ${currentSnapshot.value})`)
 			return;
@@ -225,7 +230,12 @@ export class OrdersSagaOrchestrator {
 	handleShippingResponseMessage = async (orderId: UUID, successful: boolean, messageId: UUID) => {
 		const actor = this.actors.get(orderId)
 
-		const currentSnapshot = actor.getSnapshot()
+		const currentSnapshot = actor?.getSnapshot()
+
+		if (!currentSnapshot) {
+			console.log(`Got message with invalid orderId`)
+			return
+		}
     
 		if (!currentSnapshot.matches('waitForShippingResponse')) {
 			console.log(`Already processed shipping response for orderId ${orderId} (current state: ${currentSnapshot.value})`)

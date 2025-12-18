@@ -13,52 +13,64 @@ export class OrdersService {
 	constructor(private datasource: DataSource) {}
 
 	createOrder = async (orderId: UUID, productId: number, quantity: number, snapshot: SagaSnapshot<unknown>) => {
-		console.log(`creating order with id ${orderId}`)
-		await this.datasource.transaction(async manager => {
-			const orderRepository = manager.getRepository(Order)
-			const existingOrder = await orderRepository.findOneBy({orderId})
-			if (existingOrder) {
-				console.log(`already created order with id ${orderId}, skipping`)
-				return;
-			}
-			const outboxRepository = manager.getRepository(OutboxMessage)
-			const snapshotRepository = manager.getRepository(Snapshot)
+		try {
+			console.log(`creating order with id ${orderId}`)
+			await this.datasource.transaction(async manager => {
+				const orderRepository = manager.getRepository(Order)
+				const existingOrder = await orderRepository.findOneBy({orderId})
+				if (existingOrder) {
+					console.log(`already created order with id ${orderId}, skipping`)
+					return;
+				}
+				const outboxRepository = manager.getRepository(OutboxMessage)
+				const snapshotRepository = manager.getRepository(Snapshot)
 
-			const order = new Order(orderId, productId, quantity)
-			const outboxMessage = new OutboxMessage(orderId, productId, quantity, OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
-			const sagaSnapshot = new Snapshot(orderId, STATE.CREATE_ORDER, snapshot)
+				const order = new Order(orderId, productId, quantity)
+				const outboxMessage = new OutboxMessage(orderId, productId, quantity, OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
+				const sagaSnapshot = new Snapshot(orderId, STATE.CREATE_ORDER, snapshot)
 
-			await orderRepository.save(order)
-			await outboxRepository.save(outboxMessage)
-			await snapshotRepository.save(sagaSnapshot)
-		})
+				await orderRepository.save(order)
+				await outboxRepository.save(outboxMessage)
+				await snapshotRepository.save(sagaSnapshot)
+			})
+
+		} catch (err) {
+			console.log(err)
+			throw err
+		}
 	}
 
 	finalizeOrder = async (messageId: UUID, orderId: UUID, snapshot: SagaSnapshot<unknown>) => {
+		try {
+
 		console.log(`finalizing order with id ${orderId}`)
-		await this.datasource.transaction(async manager => {
+			await this.datasource.transaction(async manager => {
 
-			const inboxRepository = this.datasource.getRepository(InboxMessage)
-			const snapshotRepository = this.datasource.getRepository(Snapshot)
-			const orderRepository = manager.getRepository(Order)
-			const message = await inboxRepository.findOneBy({id: messageId})
-			if (message) {
-			console.log(`already finalized order with id ${orderId}`)
-				return;
-			}
+				const inboxRepository = this.datasource.getRepository(InboxMessage)
+				const snapshotRepository = this.datasource.getRepository(Snapshot)
+				const orderRepository = manager.getRepository(Order)
+				const message = await inboxRepository.findOneBy({id: messageId})
+				if (message) {
+				console.log(`already finalized order with id ${orderId}`)
+					return;
+				}
 
-			const snap = new Snapshot(orderId, STATE.COMPLETE, snapshot)
-			const inboxMessage = new InboxMessage(messageId, orderId, INBOX_MESSAGE_TYPE.SHIPPING_RESPONSE, true)
-			const existingOrder = await orderRepository.findOneBy({orderId})
+				const snap = new Snapshot(orderId, STATE.COMPLETE, snapshot)
+				const inboxMessage = new InboxMessage(messageId, orderId, INBOX_MESSAGE_TYPE.SHIPPING_RESPONSE, true)
+				const existingOrder = await orderRepository.findOneBy({orderId})
 
-			existingOrder.status = ORDER_STATUS.FULFILLED
+				existingOrder.status = ORDER_STATUS.FULFILLED
 
-			await snapshotRepository.save(snap)
-			await inboxRepository.save(inboxMessage)
-			await orderRepository.save(existingOrder)
+				await snapshotRepository.save(snap)
+				await inboxRepository.save(inboxMessage)
+				await orderRepository.save(existingOrder)
 
 
-		})
+			})
+		} catch (err) {
+			console.log(err)
+			throw err
+		}
 	}
 
 }

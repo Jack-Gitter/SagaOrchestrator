@@ -11,27 +11,31 @@ export class InventoryService {
 	constructor(private datasource: DataSource) {}
 
 	handleInventoryMessage = async (messageId: UUID, orderId: UUID, productId: number, quantity: number, successful: boolean, sagaSnapshot: SagaSnapshot<unknown>) => {
-		console.log('handling inventory response message')
-		await this.datasource.transaction(async manager => {
-			const inboxRepository = manager.getRepository(InboxMessage)
-			const existingInboxMessage = await inboxRepository.findOneBy({id: messageId})
-			if (existingInboxMessage) {
-				console.log('already handled inventory message, skipping')
-				return;
-			}
+		try {
+			console.log('handling inventory response message')
+			await this.datasource.transaction(async manager => {
+				const inboxRepository = manager.getRepository(InboxMessage)
+				const existingInboxMessage = await inboxRepository.findOneBy({id: messageId})
+				if (existingInboxMessage) {
+					console.log('already handled inventory message, skipping')
+					return;
+				}
 
-			const outboxRepository = manager.getRepository(OutboxMessage)
-			const snapshotRepository = manager.getRepository(Snapshot)
+				const outboxRepository = manager.getRepository(OutboxMessage)
+				const snapshotRepository = manager.getRepository(Snapshot)
 
-			const inboxMessage = new InboxMessage(messageId, orderId, INBOX_MESSAGE_TYPE.INVENTORY_REMOVE_RESPONSE, successful)
-			const outboxMessage = new OutboxMessage(orderId, productId, quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT)
-			const snapshot = new Snapshot(orderId, STATE.HANDLE_INVENTORY_RESPONSE, sagaSnapshot)
+				const inboxMessage = new InboxMessage(messageId, orderId, INBOX_MESSAGE_TYPE.INVENTORY_REMOVE_RESPONSE, successful)
+				const outboxMessage = new OutboxMessage(orderId, productId, quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT)
+				const snapshot = new Snapshot(orderId, STATE.HANDLE_INVENTORY_RESPONSE, sagaSnapshot)
 
-			await inboxRepository.save(inboxMessage)
-			await outboxRepository.save(outboxMessage)
-			await snapshotRepository.save(snapshot)
-		})
+				await inboxRepository.save(inboxMessage)
+				await outboxRepository.save(outboxMessage)
+				await snapshotRepository.save(snapshot)
+			})
 
+		} catch (err) {
+			console.log(err)
+			throw err
+		}
 	}
-
 }
