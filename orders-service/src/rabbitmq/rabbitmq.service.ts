@@ -24,6 +24,7 @@ export class RabbitMQService {
 	  }
 
 	  await this.listenForRemoveInventoryResponse()
+	  await this.listenForShippingResponse()
 	}
 
 	sendMessage = (queue: string, message: Buffer) => {
