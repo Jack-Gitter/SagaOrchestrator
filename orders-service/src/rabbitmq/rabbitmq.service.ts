@@ -35,7 +35,7 @@ export class RabbitMQService {
 			if (msg !== null) {
 					const message: InventoryResponseMessage = JSON.parse(msg.content.toString())
 					console.log(`Received message with orderId ${message.orderId} and status ${message.successful}`);
-					await this.orderSagaOrchestrator.handleInventoryResponseMessage(message.orderId, message.successful)
+					await this.orderSagaOrchestrator.handleInventoryResponseMessage(message.orderId, message.successful, message.id)
 					this.channel.ack(msg)
 				
 			}

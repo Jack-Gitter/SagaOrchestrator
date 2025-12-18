@@ -1,10 +1,10 @@
 import { UUID } from "node:crypto";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
 import { INBOX_MESSAGE_TYPE } from "../types";
 
 @Entity('inbox')
 export class InboxMessage {
-	@PrimaryGeneratedColumn('uuid')
+	@Column({type: 'uuid', primary: true})
 	id: UUID
 
 	@Column({type: 'uuid'})
@@ -22,7 +22,8 @@ export class InboxMessage {
 	@UpdateDateColumn()
 	updatedAt: Date;
 
-	constructor(orderId: UUID, messageType: INBOX_MESSAGE_TYPE, success: boolean) {
+	constructor(id: UUID, orderId: UUID, messageType: INBOX_MESSAGE_TYPE, success: boolean) {
+		this.id = id
 		this.orderId = orderId
 		this.messageType = messageType
 		this.success = success

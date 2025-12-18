@@ -33,4 +33,8 @@ export class OrdersService {
 		})
 	}
 
+	finalizeOrder = async () => {
+		console.log('finalizing order')
+	}
+
 }

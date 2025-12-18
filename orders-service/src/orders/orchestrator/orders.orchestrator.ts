@@ -29,7 +29,7 @@ export class OrdersSagaOrchestrator {
 			types: {
 				input: {} as {orderId: UUID, productId: number, quantity: number},
 				context: {} as {orderId: UUID, productId: number, quantity: number},
-				events: {} as {type: 'receivedInventoryResponse', successful: boolean} | {type: 'receivedShippingResponse', successful: boolean}
+				events: {} as {type: 'receivedInventoryResponse', successful: boolean, messageId: UUID} | {type: 'receivedShippingResponse', successful: boolean, messageId: UUID}
 	 		},
 			actors: {
 				createOrder: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, quantity: number}}) => { 
@@ -40,8 +40,9 @@ export class OrdersSagaOrchestrator {
 						this.actors.get(input.orderId).getPersistedSnapshot()
 					)
 				}),
-				handleInventoryResponse: fromPromise(async ({input}: {input: {orderId: UUID, productId: number, successful: boolean, quantity: number}}) => {
+				handleInventoryResponse: fromPromise(async ({input}: {input: {messageId: UUID, orderId: UUID, productId: number, successful: boolean, quantity: number}}) => {
 					await this.inventoryService.handleInventoryMessage(
+						input.messageId,
 						input.orderId, 
 						input.productId, 
 						input.quantity, 
@@ -95,6 +96,7 @@ export class OrdersSagaOrchestrator {
 					invoke: {
 						src: 'handleInventoryResponse',
 						input: ({context, event}) => ({
+							messageId: event.messageId,
 							orderId: context.orderId, 
 							productId: context.productId, 
 							quantity: context.quantity,
@@ -166,7 +168,7 @@ export class OrdersSagaOrchestrator {
 		await snapshotRepository.save(snapshot)
 	}
 
-	public handleInventoryResponseMessage = async (orderId: UUID, successful: boolean) => {
+	public handleInventoryResponseMessage = async (orderId: UUID, successful: boolean, messageId: UUID) => {
 		const actor = this.actors.get(orderId)
 
 		const currentSnapshot = actor.getSnapshot()
@@ -176,7 +178,7 @@ export class OrdersSagaOrchestrator {
 			return;
 		}
 
-		actor.send({type: 'receivedInventoryResponse', successful })
+		actor.send({type: 'receivedInventoryResponse', successful, messageId })
 
 		await new Promise<void>((resolve) => {
 			const subscription = actor.subscribe((snapshot) => {
