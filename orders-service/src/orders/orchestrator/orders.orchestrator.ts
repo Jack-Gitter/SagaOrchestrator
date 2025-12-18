@@ -150,7 +150,16 @@ export class OrdersSagaOrchestrator {
 
 	public handleInventoryResponseMessage = async (orderId: UUID, successful: boolean) => {
 		const actor = this.actors.get(orderId)
+
+		const currentSnapshot = actor.getSnapshot()
+    
+		if (!currentSnapshot.matches('waitForInventoryResponse')) {
+			console.log(`Already processed inventory response for orderId ${orderId} (current state: ${currentSnapshot.value})`)
+			return;
+		}
+
 		actor.send({type: 'receivedInventoryResponse', successful })
+
 		await new Promise<void>((resolve) => {
 			const subscription = actor.subscribe((snapshot) => {
 				if (snapshot.matches('waitForShippingResponse')) {
