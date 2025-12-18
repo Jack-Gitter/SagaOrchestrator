@@ -38,6 +38,7 @@ export class RabbitMQService {
 			outboxMessages.forEach(async message => {
 				const json = message.toJson();
 				const buffer = Buffer.from(JSON.stringify(json))
+				console.log(`sending outbox message to ${message.messageType} queue`)
 				this.channel.sendToQueue(message.messageType, buffer)
 			})
 		}, 5000)
