@@ -14,12 +14,13 @@ export class FinalizeOrderStep implements SagaStepInterface<OrderSagaStepData, O
 	constructor(private datasource: DataSource) {}
 
     async invoke(data: OrderSagaStepData): Promise<void> {
+		console.log(`finalizing order with id ${data.orderId}`)
 		await this.datasource.transaction(async manager => {
 			const inboxRepository = manager.getRepository(InboxMessage)
 			const sagaRepository = manager.getRepository(OrderSagaEntity)
 			const orderRepository = manager.getRepository(Order)
 
-			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.FINALIZE_ORDER, true)
+			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.SHIPPING_RESPONSE, true)
 			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.FINALIZE_ORDER)
 			const order = await orderRepository.findOneBy({orderId: data.orderId})
 			order.status = ORDER_STATUS.FULFILLED

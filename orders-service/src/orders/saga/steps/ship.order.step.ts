@@ -14,13 +14,19 @@ export class ShipOrderStep implements SagaStepInterface<OrderSagaStepData, Order
 	constructor(private datasource: DataSource) {}
 
     async invoke(data: OrderSagaStepData): Promise<void> {
+		console.log(`shipping order for order with id ${data.orderId}`)
 		await this.datasource.transaction(async manager => {
 			const inboxRepository = manager.getRepository(InboxMessage)
+			const existingMessage = inboxRepository.findOneBy({id: data.messageId})
+			if (existingMessage) {
+				console.log(`already shipped order for order with id ${data.orderId}, skipping`)
+
+			}
 			const outboxRepository = manager.getRepository(OutboxMessage)
 			const sagaRepository = manager.getRepository(OrderSagaEntity)
 
-			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.SHIPPING_RESPONSE, true)
-			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.FINALIZE_ORDER)
+			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.INVENTORY_RESPONSE, true)
+			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT)
 			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.SHIP_ORDER)
 
 			await inboxRepository.save(inboxMessage)

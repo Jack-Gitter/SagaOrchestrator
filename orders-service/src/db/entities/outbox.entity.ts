@@ -37,5 +37,6 @@ export class OutboxMessage {
 		orderId: this.orderId,
 		productId: this.productId,
 		quantity: this.quantity,
+		success: true,
 	})
 }

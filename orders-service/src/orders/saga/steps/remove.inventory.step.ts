@@ -14,13 +14,19 @@ export class RemoveInventoryStep implements SagaStepInterface<OrderSagaStepData,
 	constructor(private datasource: DataSource) {}
 
     async invoke(data: OrderSagaStepData): Promise<void> {
+		console.log(`removing inventory for order with id ${data.orderId}`)
 		await this.datasource.transaction(async manager => {
 			const inboxRepository = manager.getRepository(InboxMessage)
+			const existingMessage = inboxRepository.findOneBy({id: data.messageId})
+			if (existingMessage) {
+				console.log(`already removed inventory for order with id ${data.orderId}, skipping`)
+				return
+			}
 			const outboxRepository = manager.getRepository(OutboxMessage)
 			const sagaRepository = manager.getRepository(OrderSagaEntity)
 
-			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.INVENTORY_RESPONSE, true)
-			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT)
+			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.REMOVE_INVENTORY_LOCAL, true)
+			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
 			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.REMOVE_INVENTORY)
 
 			await inboxRepository.save(inboxMessage)

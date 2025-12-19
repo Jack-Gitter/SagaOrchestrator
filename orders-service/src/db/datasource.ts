@@ -4,7 +4,7 @@ import { Order } from "./entities/order.entity";
 import { InboxMessage } from "./entities/inbox.entity";
 import { OutboxMessage } from "./entities/outbox.entity";
 import { OrderSagaEntity } from "./entities/saga.entity";
-import { Init1766092706426 } from "./migrations/1766092706426-init";
+import { Init1766148852922 } from "./migrations/1766148852922-init";
 
 export const datasource = new DataSource({
 	type: 'postgres',
@@ -14,5 +14,5 @@ export const datasource = new DataSource({
 	password: process.env.PG_PASSWORD,
 	database: process.env.PG_DATABASE,
 	entities: [InboxMessage, OutboxMessage, Order, OrderSagaEntity],
-	migrations: [Init1766092706426]
+	migrations: [Init1766148852922]
 })

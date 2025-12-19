@@ -14,6 +14,7 @@ export class CreateOrderStep implements SagaStepInterface<OrderSagaStepData, Ord
 	constructor(private datasource: DataSource) {}
 
     async invoke(data: OrderSagaStepData): Promise<void> {
+		console.log(`creating order with id ${data.orderId}`)
 		await this.datasource.transaction(async manager => {
 			const orderRepository = manager.getRepository(Order)
 			const outboxRepository = manager.getRepository(OutboxMessage)
@@ -21,11 +22,12 @@ export class CreateOrderStep implements SagaStepInterface<OrderSagaStepData, Ord
 
 			const existingOrder = await orderRepository.findOneBy({orderId: data.orderId})
 			if (existingOrder) {
+				console.log(`already created order with id ${data.orderId}, skipping`)
 				return
 			}
 
 			const order = new Order(data.orderId, data.productId, data.quantity)
-			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
+			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.REMOVE_INVENTORY_LOCAL)
 			const orderSagaEntity = new OrderSagaEntity(data.orderId, data.quantity, data.productId, STEP.CREATE_ORDER)
 
 			await orderRepository.save(order)
