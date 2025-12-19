@@ -20,7 +20,7 @@ export class ShipOrderStep implements SagaStepInterface<OrderSagaStepData, Order
 			const existingMessage = await inboxRepository.findOneBy({id: data.messageId, messageType: INBOX_MESSAGE_TYPE.INVENTORY_RESPONSE})
 			if (existingMessage) {
 				console.log(`already shipped order for order with id ${data.orderId}, skipping`)
-
+				return
 			}
 			const outboxRepository = manager.getRepository(OutboxMessage)
 			const sagaRepository = manager.getRepository(OrderSagaEntity)
