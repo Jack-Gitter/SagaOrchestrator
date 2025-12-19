@@ -39,6 +39,11 @@ export class ShipOrderStep implements SagaStepInterface<OrderSagaStepData, Order
 		await this.datasource.transaction(async manager => {
 			const outboxRepository = manager.getRepository(OutboxMessage)
 
+			const existingMessage = await outboxRepository.findOneBy({orderId: data.orderId, messageType: OUTBOX_MESSAGE_TYPE.SHIP_ORDER_CANCEL})
+			if (existingMessage) {
+				console.log('already compensated, skipping')
+				return
+			}
 			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_ORDER_CANCEL)
 
 			await outboxRepository.save(outboxMessage)

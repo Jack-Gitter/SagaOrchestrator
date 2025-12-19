@@ -39,6 +39,11 @@ export class RemoveInventoryStep implements SagaStepInterface<OrderSagaStepData,
 		console.log(`compensating remove inventory step`)
 		await this.datasource.transaction(async manager => {
 			const outboxRepository = manager.getRepository(OutboxMessage)
+			const existingMessage = await outboxRepository.findOneBy({orderId: data.orderId, messageType: OUTBOX_MESSAGE_TYPE.RESTORE_INVENTORY})
+			if (existingMessage) {
+				console.log('already compensated, skipping')
+				return
+			}
 
 			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.RESTORE_INVENTORY)
 
