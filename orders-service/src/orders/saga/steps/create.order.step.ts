@@ -37,6 +37,7 @@ export class CreateOrderStep implements SagaStepInterface<OrderSagaStepData, Ord
     }
 
     async compenstate(data: OrderSagaStepData): Promise<void> {
+		console.log(`compensating create order step`)
 		await this.datasource.transaction(async manager => {
 			const orderRepository = manager.getRepository(Order)
 

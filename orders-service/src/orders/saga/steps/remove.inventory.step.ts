@@ -36,6 +36,7 @@ export class RemoveInventoryStep implements SagaStepInterface<OrderSagaStepData,
     }
 
     async compenstate(data: OrderSagaStepData): Promise<void> {
+		console.log(`compensating remove inventory step`)
 		await this.datasource.transaction(async manager => {
 			const outboxRepository = manager.getRepository(OutboxMessage)
 
