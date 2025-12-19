@@ -17,6 +17,12 @@ export class FinalizeOrderStep implements SagaStepInterface<OrderSagaStepData, O
 		console.log(`finalizing order with id ${data.orderId}`)
 		await this.datasource.transaction(async manager => {
 			const inboxRepository = manager.getRepository(InboxMessage)
+			const existingMessage = await inboxRepository.findOneBy({id: data.messageId, messageType: INBOX_MESSAGE_TYPE.SHIPPING_RESPONSE})
+			if (existingMessage) {
+				console.log(`already finalized order with id ${data.orderId}, skipping`)
+				return
+			}
+
 			const sagaRepository = manager.getRepository(OrderSagaEntity)
 			const orderRepository = manager.getRepository(Order)
 
