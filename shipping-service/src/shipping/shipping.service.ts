@@ -1,7 +1,7 @@
 import { UUID } from "node:crypto";
-import { InboxMessage } from "src/db/entities/inbox.entity";
-import { OutboxMessage } from "src/db/entities/outbox.entity";
-import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from "src/db/entities/types";
+import { InboxMessage } from "../db/entities/inbox.entity";
+import { OutboxMessage } from "../db/entities/outbox.entity";
+import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from "../db/entities/types";
 import { DataSource } from "typeorm";
 
 export class ShippingService {
