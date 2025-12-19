@@ -25,7 +25,7 @@ export class RabbitMQService {
 	  for (const queue of Object.values(INBOX_MESSAGE_TYPE)) {
 		await channel.assertQueue(queue)
 	  }
-		this.handleReserveInventoryMessage()
+		await this.handleReserveInventoryMessage()
 		this.pollOutbox()
 	}
 
