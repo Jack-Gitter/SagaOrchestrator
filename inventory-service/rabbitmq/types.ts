@@ -1,9 +1,7 @@
-export enum INBOX_MESSAGE_TYPE {
-	REMOVE_INVENTORY = 'removeInventory',
-	RESTORE_INVENTORY = 'restoreInventory',
-}
+import { UUID } from "node:crypto";
 
-export enum OUTBOX_MESSAGE_TYPE {
-	INVENTORY_RESPONSE = 'inventoryResponse',
+export interface Message {
+	id: UUID,
+	orderId: UUID,
+	success: boolean
 }
-

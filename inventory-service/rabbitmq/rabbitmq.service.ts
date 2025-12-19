@@ -1,12 +1,12 @@
 import * as amqplib from 'amqplib'
 import { DataSource } from 'typeorm';
-import { INBOX_MESSAGE_TYPE } from './types';
+import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from '../db/types';
+import { Message } from './types';
 
 export class RabbitMQService {
 	private channel: amqplib.Channel
 
-	constructor(private datasource: DataSource) {
-	}
+	constructor(private datasource: DataSource) {}
 
 	async init() {
 	  const connection = await amqplib.connect({
@@ -16,41 +16,40 @@ export class RabbitMQService {
 	  const channel = await connection.createChannel();
 	  this.channel = channel;
 
+	  for (const queue of Object.values(OUTBOX_MESSAGE_TYPE)) {
+		await channel.assertQueue(queue)
+	  }
+
 	  for (const queue of Object.values(INBOX_MESSAGE_TYPE)) {
 		await channel.assertQueue(queue)
-		this.listenForMessage(queue)
 	  }
-		this.pollOutbox()
+		this.handleReserveInventoryMessage()
+		// this.pollOutbox()
 	}
 
-	listenForMessage = async (queue: INBOX_MESSAGE_TYPE | OUTBOX_MESSAGE_TYPE) => {
-		await this.channel.consume(queue, async (msg) => {
+	handleReserveInventoryMessage = async () => {
+		await this.channel.consume(INBOX_MESSAGE_TYPE.REMOVE_INVENTORY, async (msg) => {
 			if (msg !== null) {
-				const message: ResponseMessage = JSON.parse(msg.content.toString())
+				const message: Message = JSON.parse(msg.content.toString())
 				console.log(`Received message with orderId ${message.orderId} and status ${message.success}`);
-				if (message.success) {
-					await this.orderSagaOrchestrator.invokeNext(message.orderId, message.id)
-				} else {
-					await this.orderSagaOrchestrator.compensateSaga(message.orderId)
-				}
 				this.channel.ack(msg)
 			}
 		})
 	}
 
-	pollOutbox = () => {
-		const outboxRepository = this.datasource.getRepository(OutboxMessage)
-		setInterval(async () => {
-			const outboxMessages = await outboxRepository.find()
-			outboxMessages.forEach(async outboxMessage => {
-				const json = outboxMessage.toJson();
-				const buffer = Buffer.from(JSON.stringify(json))
-				console.log(`sending outbox message to ${outboxMessage.messageType} queue`)
-				this.channel.sendToQueue(outboxMessage.messageType, buffer)
-				await outboxRepository.remove(outboxMessage)
-			})
-		}, 5000)
-	}
+	// pollOutbox = () => {
+	// 	const outboxRepository = this.datasource.getRepository(OutboxMessage)
+	// 	setInterval(async () => {
+	// 		const outboxMessages = await outboxRepository.find()
+	// 		outboxMessages.forEach(async outboxMessage => {
+	// 			const json = outboxMessage.toJson();
+	// 			const buffer = Buffer.from(JSON.stringify(json))
+	// 			console.log(`sending outbox message to ${outboxMessage.messageType} queue`)
+	// 			this.channel.sendToQueue(outboxMessage.messageType, buffer)
+	// 			await outboxRepository.remove(outboxMessage)
+	// 		})
+	// 	}, 5000)
+	// }
 }
 
 
