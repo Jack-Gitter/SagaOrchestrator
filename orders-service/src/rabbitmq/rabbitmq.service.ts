@@ -31,7 +31,7 @@ export class RabbitMQService {
 		this.pollOutbox()
 	}
 
-	listenForMessage = async (queue: INBOX_MESSAGE_TYPE | OUTBOX_MESSAGE_TYPE) => {
+	listenForMessage = async (queue: INBOX_MESSAGE_TYPE) => {
 		await this.channel.consume(queue, async (msg) => {
 			if (msg !== null) {
 				const message: ResponseMessage = JSON.parse(msg.content.toString())
