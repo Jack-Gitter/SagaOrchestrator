@@ -25,7 +25,6 @@ export class InventoryService {
 
 			await inboxRepository.save(inboxMessage)
 			await outboxRepository.save(outboxMessage)
-
 		})
 	}
 	

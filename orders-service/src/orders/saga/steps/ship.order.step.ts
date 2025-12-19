@@ -39,7 +39,7 @@ export class ShipOrderStep implements SagaStepInterface<OrderSagaStepData, Order
 		await this.datasource.transaction(async manager => {
 			const outboxRepository = manager.getRepository(OutboxMessage)
 
-			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT_CANCEL)
+			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_ORDER_CANCEL)
 
 			await outboxRepository.save(outboxMessage)
 		})

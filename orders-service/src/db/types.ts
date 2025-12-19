@@ -16,6 +16,6 @@ export enum OUTBOX_MESSAGE_TYPE {
 	REMOVE_INVENTORY = 'removeInventory',
 	SHIP_ORDER = 'shipOrder',
 	RESTORE_INVENTORY = 'restoreInventory',
-	SHIP_PRODUCT_CANCEL = 'shipProductCancel',
+	SHIP_ORDER_CANCEL = 'shipOrderCancel',
 }
 
