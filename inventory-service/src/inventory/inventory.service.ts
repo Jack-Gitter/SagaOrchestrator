@@ -14,8 +14,13 @@ export class InventoryService {
 			const inboxRepository = manager.getRepository(InboxMessage)
 			const outboxRepository = manager.getRepository(OutboxMessage)
 
+			// 10% of the time fail, to test compensation
+			let success = true
+			if(Math.random() < 0.1) {
+				success = false
+			}
 			const inboxMessage = new InboxMessage(messageId, orderId, productId, quantity, INBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
-			const outboxMessage = new OutboxMessage(orderId, true, OUTBOX_MESSAGE_TYPE.INVENTORY_RESPONSE)
+			const outboxMessage = new OutboxMessage(orderId, success, OUTBOX_MESSAGE_TYPE.INVENTORY_RESPONSE)
 
 			await inboxRepository.save(inboxMessage)
 			await outboxRepository.save(outboxMessage)
