@@ -2,5 +2,6 @@
 
 docker compose up -d && \
 cd orders-service && docker compose up -d && \
-cd ../inventory-service && docker compose up -d 
+cd ../inventory-service && docker compose up -d && \
+cd ../shipping-service && docker compose up -d
 
