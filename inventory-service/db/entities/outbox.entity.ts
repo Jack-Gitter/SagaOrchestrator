@@ -1,5 +1,5 @@
 import { UUID } from "node:crypto";
-import { OUTBOX_MESSAGE_TYPE } from "./types";
+import { OUTBOX_MESSAGE_TYPE } from "../types";
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('outbox')
