@@ -23,6 +23,7 @@ export class ShippingService {
 			 this function would throw an error, and we would catch and persist the error message to the outbox */
 			let success = true
 			if(Math.random() < 0.1) {
+				console.log(`failed to ship order`)
 				success = false
 			}
 			const inboxMessage = new InboxMessage(messageId, orderId, productId, quantity, INBOX_MESSAGE_TYPE.SHIP_ORDER)
