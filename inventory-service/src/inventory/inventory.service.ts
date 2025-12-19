@@ -14,7 +14,8 @@ export class InventoryService {
 			const inboxRepository = manager.getRepository(InboxMessage)
 			const outboxRepository = manager.getRepository(OutboxMessage)
 
-			// 10% of the time fail, to test compensation
+			/* 10% of the time fail, to test compensation. In a real scenario, 
+			 this function would throw an error, and we would catch and persist the error message to the outbox */
 			let success = true
 			if(Math.random() < 0.1) {
 				success = false
