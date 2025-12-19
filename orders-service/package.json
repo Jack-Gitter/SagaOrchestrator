@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "mgrgen": "npx typeorm-ts-node-commonjs migration:generate -d src/db/datasource.ts",
-    "mgrrun": "npx typeorm-ts-node-commonjs migration:run -d src/db/datasource.ts"
+    "mgrrun": "npx typeorm-ts-node-commonjs migration:run -d src/db/datasource.ts",
+	"dev": "npm run mgrrun && npx ts-node src/main.ts"
   },
   "dependencies": {
     "@types/express": "^5.0.6",
@@ -19,8 +20,7 @@
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "tslint": "^5.20.1",
-    "typeorm": "^0.3.28",
-    "xstate": "^5.25.0"
+    "typeorm": "^0.3.28"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.8",
