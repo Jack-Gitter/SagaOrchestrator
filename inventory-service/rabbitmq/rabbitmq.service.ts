@@ -31,7 +31,16 @@ export class RabbitMQService {
 		await this.channel.consume(INBOX_MESSAGE_TYPE.REMOVE_INVENTORY, async (msg) => {
 			if (msg !== null) {
 				const message: Message = JSON.parse(msg.content.toString())
-				console.log(`Received message with orderId ${message.orderId} and status ${message.success}`);
+				console.log(`Received message with orderId ${message.orderId} and status ${message.success} on queue ${INBOX_MESSAGE_TYPE.REMOVE_INVENTORY}`);
+				this.channel.ack(msg)
+			}
+		})
+	}
+	handleRestoreInventory = async () => {
+		await this.channel.consume(INBOX_MESSAGE_TYPE.RESTORE_INVENTORY, async (msg) => {
+			if (msg !== null) {
+				const message: Message = JSON.parse(msg.content.toString())
+				console.log(`Received message with orderId ${message.orderId} and status ${message.success} on queue ${INBOX_MESSAGE_TYPE.RESTORE_INVENTORY}`);
 				this.channel.ack(msg)
 			}
 		})
