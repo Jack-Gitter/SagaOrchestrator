@@ -31,9 +31,9 @@ export class OrderSaga {
 	}
 
 	async compensate(messageId?: UUID) {
-		const stepsToRollback = this.completed.slice(0, -1)
-		await Promise.all(stepsToRollback.map(async step => {
-			return await step.compenstate({messageId, orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
-		}))
+		const stepsToRollback = this.completed.slice(0, -1).reverse()
+		for (const step of stepsToRollback) {
+			await step.compenstate({messageId, orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
+		}
 	}
 }

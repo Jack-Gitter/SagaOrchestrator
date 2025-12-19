@@ -37,10 +37,13 @@ export class ShipOrderStep implements SagaStepInterface<OrderSagaStepData, Order
     async compenstate(data: OrderSagaStepData): Promise<void> {
 		await this.datasource.transaction(async manager => {
 			const outboxRepository = manager.getRepository(OutboxMessage)
+			const sagaRepository = manager.getRepository(OrderSagaEntity)
 
 			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT_CANCEL)
+			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.COMPENSATE)
 
 			await outboxRepository.save(outboxMessage)
+			await sagaRepository.save(sagaEntity)
 		})
     }
 }
