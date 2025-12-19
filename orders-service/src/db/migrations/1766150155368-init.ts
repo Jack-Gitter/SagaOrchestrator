@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Init1766149471070 implements MigrationInterface {
-    name = 'Init1766149471070'
+export class Init1766150155368 implements MigrationInterface {
+    name = 'Init1766150155368'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TYPE "public"."orders_status_enum" AS ENUM('pending', 'canceled', 'fulfilled')`);
@@ -10,7 +10,7 @@ export class Init1766149471070 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "inbox" ("id" uuid NOT NULL, "orderId" uuid NOT NULL, "messageType" "public"."inbox_messagetype_enum" NOT NULL, "success" boolean NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_ab7abc299fab4bb4f965549c819" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TYPE "public"."outbox_messagetype_enum" AS ENUM('removeInventoryLocal', 'removeInventory', 'shipOrder', 'restoreInventory', 'shipProductCancel')`);
         await queryRunner.query(`CREATE TABLE "outbox" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "orderId" uuid NOT NULL, "productId" integer NOT NULL, "quantity" integer NOT NULL, "messageType" "public"."outbox_messagetype_enum" NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_340ab539f309f03bdaa14aa7649" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TYPE "public"."saga_lastcompletedstep_enum" AS ENUM('createOrder', 'removeInventory', 'shipOrder', 'finalizeOrder')`);
+        await queryRunner.query(`CREATE TYPE "public"."saga_lastcompletedstep_enum" AS ENUM('createOrder', 'removeInventory', 'shipOrder', 'finalizeOrder', 'compensate')`);
         await queryRunner.query(`CREATE TABLE "saga" ("orderId" uuid NOT NULL, "productId" integer NOT NULL, "quantity" integer NOT NULL, "lastCompletedStep" "public"."saga_lastcompletedstep_enum" NOT NULL, CONSTRAINT "PK_4b060ebb00478a66dc7c0a9dd51" PRIMARY KEY ("orderId"))`);
     }
 
