@@ -35,7 +35,7 @@ export class OrderSagaOrchestrator {
 	async restoreFromDb() {
 		const sagaRepository = this.datasource.getRepository(OrderSagaEntity)
 		const sagaEntities = await sagaRepository.find()
-		const sagas = sagaEntities.filter(entity => entity.lastCompletedStep !== STEP.FINALIZE_ORDER).map(entity => {
+		const sagas = sagaEntities.filter(entity => entity.lastCompletedStep !== STEP.FINALIZE_ORDER && entity.lastCompletedStep !== STEP.COMPENSATE).map(entity => {
 			console.log(`restoring saga with order id ${entity.orderId}. Last completed step was ${entity.lastCompletedStep}`)
 			return this.orderSagaFactory.createSaga(
 				entity.orderId, 
