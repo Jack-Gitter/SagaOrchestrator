@@ -3,6 +3,7 @@ import { OrderSaga } from "./orders.saga";
 import { OrderSagaFactory } from "./orders.saga.factory";
 import { DataSource } from "typeorm";
 import { OrderSagaEntity } from "../../db/entities/saga.entity";
+import { STEP } from "../../db/entities/types";
 
 export class OrderSagaOrchestrator {
 
@@ -34,7 +35,7 @@ export class OrderSagaOrchestrator {
 	async restoreFromDb() {
 		const sagaRepository = this.datasource.getRepository(OrderSagaEntity)
 		const sagaEntities = await sagaRepository.find()
-		const sagas = sagaEntities.map(entity => {
+		const sagas = sagaEntities.filter(entity => entity.lastCompletedStep !== STEP.FINALIZE_ORDER).map(entity => {
 			console.log(`restoring saga with order id ${entity.orderId}. Last completed step was ${entity.lastCompletedStep}`)
 			return this.orderSagaFactory.createSaga(
 				entity.orderId, 
