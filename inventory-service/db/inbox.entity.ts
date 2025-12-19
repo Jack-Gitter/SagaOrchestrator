@@ -10,11 +10,14 @@ export class InboxMessage {
 	@Column({type: 'uuid'})
 	orderId: UUID
 
-	@Column({type: 'enum', enum: INBOX_MESSAGE_TYPE})
-	messageType: INBOX_MESSAGE_TYPE
+	@Column()
+	productId: number
 
 	@Column()
-	success: boolean
+	quantity: number
+
+	@Column({type: 'enum', enum: INBOX_MESSAGE_TYPE})
+	messageType: INBOX_MESSAGE_TYPE
 
 	@CreateDateColumn()
 	createdAt: Date;
@@ -22,10 +25,9 @@ export class InboxMessage {
 	@UpdateDateColumn()
 	updatedAt: Date;
 
-	constructor(id: UUID, orderId: UUID, messageType: INBOX_MESSAGE_TYPE, success: boolean) {
+	constructor(id: UUID, orderId: UUID, messageType: INBOX_MESSAGE_TYPE) {
 		this.id = id
 		this.orderId = orderId
 		this.messageType = messageType
-		this.success = success
 	}
 }
