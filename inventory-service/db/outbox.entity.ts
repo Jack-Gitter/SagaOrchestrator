@@ -10,14 +10,11 @@ export class OutboxMessage {
 	@Column({type: 'uuid'})
 	orderId: UUID
 
-	@Column('int')
-	productId: number
-
-	@Column('int')
-	quantity: number
-
 	@Column({type: 'enum', enum: OUTBOX_MESSAGE_TYPE})
 	messageType: OUTBOX_MESSAGE_TYPE
+
+	@Column()
+	success: boolean
 
 	@CreateDateColumn()
 	createdAt: Date;
@@ -25,18 +22,15 @@ export class OutboxMessage {
 	@UpdateDateColumn()
 	updatedAt: Date;
 
-	constructor(orderId: UUID, productId: number, quantity: number, messageType: OUTBOX_MESSAGE_TYPE) {
+	constructor(orderId: UUID, success: boolean, messageType: OUTBOX_MESSAGE_TYPE) {
 		this.orderId = orderId
-		this.quantity = quantity
-		this.productId = productId
 		this.messageType = messageType
+		this.success = success
 	}
 
 	public toJson = () => ({
 		id: this.id,
 		orderId: this.orderId,
-		productId: this.productId,
-		quantity: this.quantity,
-		success: true,
+		success: this.success,
 	})
 }
