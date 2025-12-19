@@ -31,13 +31,6 @@ export class OrderSagaOrchestrator {
 		await saga.compensate(messageId)
 	}
 
-	handleMessage(message: any) {
-		// extract the orderId
-		// look up the saga
-		// figure out whether the message was successful
-		// either invokeNext or rollbackSaga
-	}
-
 	async restoreFromDb() {
 		const sagaRepository = this.datasource.getRepository(OrderSagaEntity)
 		const sagaEntities = await sagaRepository.find()
