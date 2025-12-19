@@ -36,7 +36,7 @@ export class RabbitMQService {
 			if (msg !== null) {
 				const message: Message = JSON.parse(msg.content.toString())
 				console.log(`Received message with orderId ${message.orderId} and status ${message.success} on queue ${INBOX_MESSAGE_TYPE.SHIP_ORDER}`);
-				await this.inventoryService.removeInventory(message.id, message.orderId, message.productId, message.quantity)
+				await this.shippingService.shipOrder(message.id, message.orderId, message.productId, message.quantity)
 				this.channel.ack(msg)
 			}
 		})
