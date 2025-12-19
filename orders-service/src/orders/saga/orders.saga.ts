@@ -21,6 +21,10 @@ export class OrderSaga {
 	}
 
 	async invokeNext(messageId?: UUID) {
+		if (this.index == this.steps.length) {
+			console.log('No more steps left, saga is completed')
+			return
+		}
 		await this.steps[this.index].invoke({messageId, orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
 		this.completed.push(this.steps[this.index])
 		this.index+=1
