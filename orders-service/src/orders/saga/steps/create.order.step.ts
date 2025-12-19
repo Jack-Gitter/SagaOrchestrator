@@ -40,10 +40,13 @@ export class CreateOrderStep implements SagaStepInterface<OrderSagaStepData, Ord
 		console.log(`compensating create order step`)
 		await this.datasource.transaction(async manager => {
 			const orderRepository = manager.getRepository(Order)
+			const sagaRepository = manager.getRepository(OrderSagaEntity)
 
+			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.COMPENSATE)
 			const existingOrder = await orderRepository.findOneBy({orderId: data.orderId})
 			existingOrder.status = ORDER_STATUS.CANCELED
 
+			await sagaRepository.save(sagaEntity)
 			await orderRepository.save(existingOrder)
 		})
 
