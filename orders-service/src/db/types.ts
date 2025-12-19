@@ -14,7 +14,7 @@ export enum INBOX_MESSAGE_TYPE {
 export enum OUTBOX_MESSAGE_TYPE {
 	REMOVE_INVENTORY_LOCAL = 'removeInventoryLocal',
 	REMOVE_INVENTORY = 'removeInventory',
-	SHIP_PRODUCT = 'shipProduct',
+	SHIP_ORDER = 'shipOrder',
 	RESTORE_INVENTORY = 'restoreInventory',
 	SHIP_PRODUCT_CANCEL = 'shipProductCancel',
 }

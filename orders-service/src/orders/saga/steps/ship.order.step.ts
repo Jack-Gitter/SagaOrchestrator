@@ -26,7 +26,7 @@ export class ShipOrderStep implements SagaStepInterface<OrderSagaStepData, Order
 			const sagaRepository = manager.getRepository(OrderSagaEntity)
 
 			const inboxMessage = new InboxMessage(data.messageId, data.orderId, INBOX_MESSAGE_TYPE.INVENTORY_RESPONSE, true)
-			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_PRODUCT)
+			const outboxMessage = new OutboxMessage(data.orderId, data.productId, data.quantity, OUTBOX_MESSAGE_TYPE.SHIP_ORDER)
 			const sagaEntity = new OrderSagaEntity(data.orderId, data.productId, data.quantity, STEP.SHIP_ORDER)
 
 			await inboxRepository.save(inboxMessage)
