@@ -1,6 +1,6 @@
 import { UUID } from "node:crypto";
 import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
-import { INBOX_MESSAGE_TYPE } from "../types";
+import { INBOX_MESSAGE_TYPE } from "./types";
 
 @Entity('inbox')
 export class InboxMessage {
