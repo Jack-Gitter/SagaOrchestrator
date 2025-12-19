@@ -32,10 +32,7 @@ export class OrderSaga {
 
 	async compensate(messageId?: UUID) {
 		console.log(`compensating saga with orderId: ${this.orderId}`)
-		console.log(this.completed.length)
 		const stepsToRollback = this.completed.slice(0, -1).reverse()
-		console.log(stepsToRollback.length)
-		console.log(stepsToRollback[0].step)
 		for (const step of stepsToRollback) {
 			await step.compenstate({messageId, orderId: this.orderId, productId: this.productId, quantity: this.quantity, orderSaga: this})
 		}
