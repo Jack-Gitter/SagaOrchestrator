@@ -17,7 +17,7 @@ export class RemoveInventoryStep implements SagaStepInterface<OrderSagaStepData,
 		console.log(`removing inventory for order with id ${data.orderId}`)
 		await this.datasource.transaction(async manager => {
 			const inboxRepository = manager.getRepository(InboxMessage)
-			const existingMessage = inboxRepository.findOneBy({id: data.messageId, messageType: INBOX_MESSAGE_TYPE.REMOVE_INVENTORY_LOCAL})
+			const existingMessage = await inboxRepository.findOneBy({id: data.messageId, messageType: INBOX_MESSAGE_TYPE.REMOVE_INVENTORY_LOCAL})
 			if (existingMessage) {
 				console.log(`already removed inventory for order with id ${data.orderId}, skipping`)
 				return
