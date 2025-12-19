@@ -2,13 +2,15 @@ import * as amqplib from 'amqplib'
 import { DataSource } from 'typeorm';
 import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from '../db/types';
 import { Message } from './types';
-import { InventoryService } from 'inventory/inventory.service';
-import { OutboxMessage } from 'db/entities/outbox.entity';
+import { InventoryService } from '../inventory/inventory.service';
+import { OutboxMessage } from '../db/entities/outbox.entity';
 
 export class RabbitMQService {
 	private channel: amqplib.Channel
 
-	constructor(private datasource: DataSource, private inventoryService: InventoryService) {}
+	constructor(private datasource: DataSource, private inventoryService: InventoryService) {
+		console.log('inventory service is listening for messages')
+	}
 
 	async init() {
 	  const connection = await amqplib.connect({

@@ -1,6 +1,6 @@
-import { InboxMessage } from "db/entities/inbox.entity";
-import { OutboxMessage } from "db/entities/outbox.entity";
-import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from "db/types";
+import { InboxMessage } from "../db/entities/inbox.entity";
+import { OutboxMessage } from "../db/entities/outbox.entity";
+import { INBOX_MESSAGE_TYPE, OUTBOX_MESSAGE_TYPE } from "../db/types";
 import { UUID } from "node:crypto";
 import { DataSource } from "typeorm";
 
@@ -14,7 +14,7 @@ export class InventoryService {
 			const inboxRepository = manager.getRepository(InboxMessage)
 			const outboxRepository = manager.getRepository(OutboxMessage)
 
-			const inboxMessage = new InboxMessage(messageId, orderId, INBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
+			const inboxMessage = new InboxMessage(messageId, orderId, productId, quantity, INBOX_MESSAGE_TYPE.REMOVE_INVENTORY)
 			const outboxMessage = new OutboxMessage(orderId, true, OUTBOX_MESSAGE_TYPE.INVENTORY_RESPONSE)
 
 			await inboxRepository.save(inboxMessage)
@@ -29,7 +29,7 @@ export class InventoryService {
 		await this.datasource.transaction(async manager => {
 			const inboxRepository = manager.getRepository(InboxMessage)
 
-			const inboxMessage = new InboxMessage(messageId, orderId, INBOX_MESSAGE_TYPE.RESTORE_INVENTORY)
+			const inboxMessage = new InboxMessage(messageId, orderId, productId, quantity, INBOX_MESSAGE_TYPE.RESTORE_INVENTORY)
 
 			await inboxRepository.save(inboxMessage)
 

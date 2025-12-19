@@ -25,9 +25,11 @@ export class InboxMessage {
 	@UpdateDateColumn()
 	updatedAt: Date;
 
-	constructor(id: UUID, orderId: UUID, messageType: INBOX_MESSAGE_TYPE) {
+	constructor(id: UUID, orderId: UUID, productId: number, quantity: number, messageType: INBOX_MESSAGE_TYPE) {
 		this.id = id
 		this.orderId = orderId
+		this.productId = productId
+		this.quantity = quantity
 		this.messageType = messageType
 	}
 }

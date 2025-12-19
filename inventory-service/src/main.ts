@@ -1,10 +1,10 @@
 import 'reflect-metadata'
 import 'dotenv/config'
-import { InboxMessage } from 'db/entities/inbox.entity'
-import { OutboxMessage } from 'db/entities/outbox.entity'
+import { InboxMessage } from './db/entities/inbox.entity'
+import { OutboxMessage } from './db/entities/outbox.entity'
 import { DataSource } from 'typeorm'
-import { RabbitMQService } from 'rabbitmq/rabbitmq.service'
-import { InventoryService } from 'inventory/inventory.service'
+import { RabbitMQService } from './rabbitmq/rabbitmq.service'
+import { InventoryService } from './inventory/inventory.service'
 
 const main = async () => {
 
