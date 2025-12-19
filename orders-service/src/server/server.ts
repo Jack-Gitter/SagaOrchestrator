@@ -17,6 +17,9 @@ export class Server {
 
 	private placeOrder = async (req: express.Request, res: express.Response) => {
 		const {productId, quantity}: {productId: number, quantity: number} = req.body
+		if (!productId || !quantity) {
+			res.status(400).send('No product or quantity')
+		}
 		await this.orderSagaOrchestrator.newSaga(productId, quantity)
 		res.send()
 	}
