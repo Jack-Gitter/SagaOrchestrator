@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { InboxMessage } from "./entities/inbox.entity";
 import { OutboxMessage } from "./entities/outbox.entity";
+import 'dotenv/config'
 
 export const datasource = new DataSource({
 	type: 'postgres',
